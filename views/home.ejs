@@ -1,0 +1,81 @@
+<% include header.html %>
+
+	<!-- START #fh5co-header -->
+	<div class="fh5co-spacer fh5co-spacer-xs"></div>
+	<div class="fh5co-spacer fh5co-spacer-xs"></div>
+	<header id="fh5co-header-section" role="header" class="" >
+		<div class="container">
+			<!-- <div id="fh5co-menu-logo"> -->
+				<!-- START #fh5co-logo -->
+				<!--<h1 id="fh5co-logo" class="pull-left"><a href="index.html"><img src="images/logo.png" alt="EchBlockChain"></a></h1>-->
+				<h1 id="fh5co-logo" class="pull-left"><a href="index" style="color:#f86942;">易诚互动区块链</a></h1>
+				<!-- START #fh5co-menu-wrap -->
+				<nav id="fh5co-menu-wrap" role="navigation">					
+					<ul class="sf-menu" id="fh5co-primary-menu">
+						<li><a href="index" style="font-size:15px;">首页</a></li>
+						<li class="active">
+							<a href="home" style="font-size:15px;">资产管理</a>
+							<!-- <ul class="fh5co-sub-menu">
+								<li><a href="#" style="font-size:15px;">1元购</a></li> 
+								</ul> -->         
+						</li>
+						<li><a href="#" style="font-size:15px;">关于我们</a></li>
+						<li>
+							<a href="#" class="fh5co-sub-ddown" style="font-size:15px;"><%=user%></a>
+								<ul class="fh5co-sub-menu">
+								<li><a href="logout" style="font-size:15px;">安全退出</a></li> 
+							</ul>
+						</li>							
+					</ul>
+				</nav>
+			<!-- </div> -->
+		</div>
+	</header> 
+	
+	<div id="fh5co-main">
+		<div class="container">
+　　　　　　　　　 <div class="fh5co-spacer fh5co-spacer-md"></div>
+			<div class="row" id="fh5co-features">
+				<div class="col-md-4 col-sm-6 text-center fh5co-feature feature-box">
+					<div class="fh5co-feature-icon">
+						<a href="userAddress"><i class="fa fa-user fa-5x"></i></a>
+					</div>
+					<h3 class="heading">账户管理</h3>					
+				</div>			
+				<div class="col-md-4 col-sm-6 text-center fh5co-feature feature-box">
+					<div class="fh5co-feature-icon">
+						<a href="tid"><i class="fa fa-bar-chart fa-5x"></i></a>
+					</div>
+					<h3 class="heading">交易记录</h3>					
+				</div>
+				<div class="col-md-4 col-sm-6 text-center fh5co-feature feature-box"> 
+					<div class="fh5co-feature-icon">
+						<a href="query"><i class="fa fa-search fa-4x"></i></a>
+					</div>
+					<h3 class="heading">资产查询</h3>						
+				</div>
+				<div class="col-md-4 col-sm-6 text-center fh5co-feature feature-box"> 
+					<div class="fh5co-feature-icon">
+						<a href="assign"><i class="fa fa-money fa-4x"></i></a>
+					</div>
+					<h3 class="heading">资产申请</h3>						
+				</div>
+				<div class="col-md-4 col-sm-6 text-center fh5co-feature feature-box"> 
+					<div class="fh5co-feature-icon">
+						<a href="transfer"><i class="fa fa-share-alt-square fa-4x"></i></a>
+					</div>
+					<h3 class="heading">资产转移</h3>						
+				</div>
+				<div class="col-md-4 col-sm-6 text-center fh5co-feature feature-box"> 
+					<div class="fh5co-feature-icon">
+						<a href="logout"><i class="fa fa-laptop fa-4x"></i></a>
+					</div>
+					<h3 class="heading">用户登出</h3>						
+				</div>					
+			</div><!-- END row -->
+			<div class="fh5co-spacer fh5co-spacer-md"></div>
+
+		</div><!-- END container -->		
+	</div><!-- END fhtco-main -->
+
+<% include footer.html %>

@@ -1,0 +1,165 @@
+<% include header.html %>
+
+    <!-- START #fh5co-header -->
+    <div class="fh5co-spacer fh5co-spacer-xs"></div>
+    <div class="fh5co-spacer fh5co-spacer-xs"></div>
+        <header id="fh5co-header-section" role="header" class="" >
+            <div class="container">
+                <!-- <div id="fh5co-menu-logo"> -->
+                <!-- START #fh5co-logo -->
+                <!--<h1 id="fh5co-logo" class="pull-left"><a href="index.html"><img src="images/logo.png" alt="EchBlockChain"></a></h1>-->
+				<h1 id="fh5co-logo" class="pull-left"><a href="index" style="color:#f86942;">易诚互动区块链</a></h1>
+				<!-- START #fh5co-menu-wrap -->
+				<nav id="fh5co-menu-wrap" role="navigation">					
+					<ul class="sf-menu" id="fh5co-primary-menu">
+						<li><a href="index" style="font-size:15px;">首页</a></li>
+						<li class="active">
+							<a href="home" style="font-size:15px;">资产管理</a>
+					    </li>
+						<li><a href="#" style="font-size:15px;">关于我们</a></li>
+                        <li>
+                            <a href="#" class="fh5co-sub-ddown" style="font-size:15px;"><%=user%></a>
+                                <ul class="fh5co-sub-menu">
+                                <li><a href="logout" style="font-size:15px;">安全退出</a></li> 
+                            </ul>
+						</li>
+					</ul>
+				</nav>
+            </div>
+        </header>
+
+		<div id="fh5co-main">
+			<div class="container">
+                <div class="fh5co-spacer fh5co-spacer-md"></div>
+				<div class="row">
+						<form class="form-horizontal" method="post">                     
+                                <div class="col-md-3 col-md-offset-1 animate-box">
+                                    <div class="form-group">                         
+                                        <select class="form-control input-md" style="color:#9D9D9D;" id="asset" onmousedown="return changeColor1();">
+                                            <option>选择资产</option>
+                                            <% for(var i=0; i<assetList.length;i++){%>
+                                                <option><%= assetList[i].asset %></option>
+                                            <%}%>
+                                        </select>
+                                    </div>	
+                                </div>
+                                <div class="col-md-3 col-md-offset-2 animate-box">
+                                    <div class="form-group">
+                                        <input placeholder=" 资产数量" id="amount" type="text" class="form-control input-md" onclick="return load();">
+                                    </div>
+                                </div> 
+                                <div class="col-md-8 col-md-offset-1 animate-box">
+                                    <div class="form-group">                         
+                                        <select class="form-control input-md" style="color:#9D9D9D;" id="address" onmousedown="return changeColor2();">
+                                            <option>选择账户</option>
+                                            <% for(var i=0; i<addressList.length;i++){%>
+                                                <option><%= addressList[i].address %></option>
+                                            <%}%>
+                                        </select>
+                                    </div>	
+                                </div>
+                                <div class="col-md-8 col-md-offset-4 animate-box">
+                                    <div class="col-md-10">
+                                        <p style="color:#FF0000;"><span id="errMessage"></span></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-8 col-md-offset-4 animate-box">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <input type="button" class="btn btn-primary btn-md " id="assign" value="申请">
+                                            <input type="reset" class="btn btn-outline btn-md"  id="reset" value="重置" onclick="return changeColorRe();">
+                                        </div>	
+                                    </div>
+                                </div>                
+						</form>						
+				</div><!-- END row -->
+                <div class="fh5co-spacer fh5co-spacer-sm"></div>
+
+			</div><!-- END container -->		
+		</div><!-- END fhtco-main -->                   
+
+<% include footer.html %>
+
+<script type="text/javascript">
+function load() {
+    document.getElementById('errMessage').innerHTML = "";
+}
+function changeColor1(){
+   document.getElementById('errMessage').innerHTML = "";
+   var spanElement = document.getElementById("asset");  
+   spanElement.setAttribute("style","color:#5B5B5B;");  
+   spanElement.style.cssText = "color:#5B5B5B;";  
+}
+function changeColor2(){
+   document.getElementById('errMessage').innerHTML = "";
+   var spanElement = document.getElementById("address");  
+   spanElement.setAttribute("style","color:#5B5B5B;");  
+   spanElement.style.cssText = "color:#5B5B5B;";  
+}
+function changeColorRe(){
+    document.getElementById('errMessage').innerHTML = "";
+    var spanElement = document.getElementById("asset");  
+    spanElement.setAttribute("style","color:#9D9D9D;");  
+    spanElement.style.cssText = "color:#9D9D9D;"; 
+    spanElement = document.getElementById("address");  
+    spanElement.setAttribute("style","color:#9D9D9D;");  
+    spanElement.style.cssText = "color:#9D9D9D;";  
+}
+$(function() {
+    $("#reset").click(function() {
+        load();
+    });
+    $("#assign").click(function() {
+        load();
+        var $txtAmount = $('#amount'),
+        amount = $.trim($txtAmount.val()),
+        $txtAddress = $('#address'),
+        address = $txtAddress.val();
+        $txtAsset = $('#asset'),
+        asset = $txtAsset.val();
+        if (address == "选择资产") {
+            document.getElementById('errMessage').innerHTML = "请选择资产";
+            $txtAsset.focus();
+            return false;
+        }                 
+        if (amount.length == 0) {
+            document.getElementById('errMessage').innerHTML = "资产数量不能为空";
+            $txtAmount.focus();
+            return false;
+        }
+        if (isNaN(Number(amount))) {
+            document.getElementById('errMessage').innerHTML = "资产数量错误";
+            $txtAmount.focus();
+            return false;
+        }
+        if (address == "选择账户") {
+            document.getElementById('errMessage').innerHTML = "请选择账户";
+            $txtAddress.focus();
+            return false;
+        }       
+        var data = {
+            "amount": amount,
+            "asset": asset,
+            "address": address
+        };
+        $.ajax({
+            url: '/assign',
+            type: 'post',
+            data: data,
+            dataType: 'json',
+            success: function(data) {
+                var ret = $.parseJSON(data);
+                if (ret.code == 200) {
+                    alert("资产申请成功");
+                } else {
+                    document.getElementById('errMessage').innerHTML = ret.tips;
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                //alert('error ' + textStatus + " " + errorThrown);
+                document.getElementById('errMessage').innerHTML = errorThrown;
+            }
+        });
+    });
+});
+</script>

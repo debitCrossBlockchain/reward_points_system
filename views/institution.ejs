@@ -1,0 +1,148 @@
+<% include header.html %>
+	
+    <!-- START #fh5co-header -->
+    <div class="fh5co-spacer fh5co-spacer-xs"></div>
+    <div class="fh5co-spacer fh5co-spacer-xs"></div>
+    <header id="fh5co-header-section" role="header" class="">
+        <div class="container">
+            <!-- <div id="fh5co-menu-logo"> -->
+            <!-- START #fh5co-logo -->
+            <!--<h1 id="fh5co-logo" class="pull-left"><a href="index.html"><img src="images/logo.png" alt="EchBlockChain"></a></h1>-->
+            <h1 id="fh5co-logo" class="pull-left"><a href="index" style="color:#f86942;">易诚互动区块链</a></h1>
+            <!-- START #fh5co-menu-wrap -->
+            <nav id="fh5co-menu-wrap" role="navigation">
+                <ul class="sf-menu" id="fh5co-primary-menu">
+                    <li><a href="index" style="font-size:15px;">首页</a></li>
+                    <li class="active">
+                        <a href="adminHome" style="font-size:15px;">资产管理</a>
+                        <!-- <ul class="fh5co-sub-menu">
+                                <li><a href="#" style="font-size:15px;">1元购</a></li> 
+                                </ul> -->
+                    </li>
+                    <li><a href="#" style="font-size:15px;">关于我们</a></li>
+                    <li>
+                        <a href="#" class="fh5co-sub-ddown" style="font-size:15px;"><%=user%></a>
+                            <ul class="fh5co-sub-menu">
+                            <li><a href="logout" style="font-size:15px;">安全退出</a></li> 
+                        </ul>
+                    </li>                      
+                    <!--<li class="fh5co-special"><a href="contact.html">Get started</a></li>-->
+                </ul>
+            </nav>
+            <!-- </div> -->
+        </div>
+    </header>
+
+    <div id="fh5co-main">
+        <div class="container">
+            <div class="row">
+                                
+                <div class="col-md-12 animate-box">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="button" class="btn btn-outline btn-md" id="add" value="机构注册" onclick="window.location.href='insRegister'">
+                            <input type="button" class="btn btn-outline btn-md" id="query" value="机构列表">
+                        </div>	
+                    </div>
+                </div>                   
+
+                <div class="col-md-9 animate-box">
+                    <div class="panel-group fh5co-accordion" id="accordion" role="tablist" aria-multiselectable="true">
+                        <% for(var i=0; i<institutionList.length;i++){%>
+                            <div class="panel panel-default" id="accordiontest">
+                                <div class="panel-heading collapsed" role="tab" id="<%= 'head'+i %>" data-toggle="collapse" data-parent="#accordion" data-target="<%= '#collapse'+i %>" aria-expanded="false" aria-controls="<%= 'collapse'+i %>">
+                                    <h4 class="panel-title"><a class="accordion-toggle"><%= institutionList[i].name %></a></h4>
+                                </div>
+                                <div id="<%= 'collapse'+i %>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="<%= 'head'+i %>">
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            资产名称
+                                                        </th>
+                                                        <th>
+                                                            资产数量
+                                                        </th>
+                                                        <th>
+                                                            资产期限
+                                                        </th>                                                           
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="<%= 'context'+i %>"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <%}%>
+                        <!--<div class="panel panel-default">
+                            <div class="panel-heading collapsed" role="tab" id="headingTwo" data-toggle="collapse" data-parent="#accordion" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <h4 class="panel-title"><a class="accordion-toggle">Anim pariatur cliche reprehenderit</a></h4>
+                            </div>
+                            <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                <div class="panel-body">
+                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading collapsed" role="tab" id="headingThree" data-toggle="collapse" data-parent="#accordion" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <h4 class="panel-title"><a class="accordion-toggle">Raw denim aesthetic synth</a></h4>
+                            </div>
+                            <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                                <div class="panel-body">
+                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                                </div>
+                            </div>
+                        </div>-->
+                    </div>
+                </div>
+                            
+            </div>
+            <!-- END row -->
+        </div>
+        <!-- END container -->
+    </div>
+    <!-- END fhtco-main -->
+
+<% include footer.html %>
+
+<script type="text/javascript">
+$(function() {
+    $div = $('#accordion').find('a');
+    $div.each(function(i) {
+        var institution = $(this).text();
+        $collapse = $(this).parent().parent().next(); 
+        $collapse.on('show.bs.collapse',
+        function() {
+            var data = {
+                "institution": institution
+            };
+            $.ajax({
+                url: '/institution',
+                type: 'post',
+                data: data,
+                dataType: 'json',
+                success: function(data) {
+                    var ret = $.parseJSON(data);
+                    if (ret.code == 200) {
+                        var vv = "";
+                        var assetList = $.parseJSON(ret.tips);
+                        for (j = 0; j < assetList.length; j++) {
+                            vv = vv + "<tr><td>" + assetList[j].assetName + "</td><td>" + assetList[j].amount + "</td><td>" + assetList[j].expire + "</td></tr>";
+                        }
+                        document.getElementById("context"+i).innerHTML = vv;
+                    } else {
+                        //alert("账户查询失败，错误：" + ret.tips);
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    //alert("账户查询失败，错误：" + errorThrown);
+                }
+            });
+        })
+    });
+});
+</script>
