@@ -1,9 +1,10 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var models = require("./models");
+conn = mongoose.createConnection("mongodb://localhost:27017/ynetbcdb");
 
 for(var m in models){ 
-    mongoose.model(m,new Schema(models[m]),m);
+    conn.model(m,new Schema(models[m]),m);
 }
 
 module.exports = { 
@@ -13,5 +14,5 @@ module.exports = {
 };
 
 var _getModel = function(type){ 
-    return mongoose.model(type);
+    return conn.model(type);
 };
