@@ -33,7 +33,7 @@ var app = express();
 
 //db
 global.dbHandel = require('./database/dbHandel');
-global.db = mongoose.connect("mongodb://localhost:27017/ynetbcdb");
+//global.db = mongoose.createConnection("mongodb://localhost:27017/ynetbcdb");
 
 global.blockchainJson;
 
