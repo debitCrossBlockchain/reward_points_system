@@ -14,7 +14,7 @@
 					<ul class="sf-menu" id="fh5co-primary-menu">
 						<li><a href="index" style="font-size:15px;">首页</a></li>
 						<li class="active">
-							<a href="home" style="font-size:15px;">资产管理</a>
+							<a href="home" style="font-size:15px;">积分购</a>
 					    </li>
 						<li><a href="#" style="font-size:15px;">关于我们</a></li>
                         <li>
@@ -35,32 +35,31 @@
 
                         <div class="col-md-9">
                             <div class="input-group">
-                                <input type="button" class="btn btn-outline btn-md" id="query" value="资产查询"> 
+                                <input type="button" class="btn btn-outline btn-md" id="query" value="积分查询"> 
                                 <span style="color:#FF0000;" id="errMessage"></span>
                             </div>
                         </div>
-          
-                        <div class="col-md-4">         
-                            <div class="form-group">    
-                                <select class="form-control input-md" id="asset">
-                                    <option>选择资产</option>
-                                    <% for(var i=0; i<assetList.length;i++){%>
-                                        <option><%= assetList[i].asset %></option>
-                                    <%}%>
-                                </select>                                 
-                            </div>                 
-                        </div>                     
 
-                        <div class="col-md-9">
+                        <div class="fh5co-spacer fh5co-spacer-xxs"></div>
+
+                        <div class="col-md-3 col-md-offset-0 animate-box">
                             <div class="form-group">
-                                <select class="form-control input-md" id="address">
+                                <input placeholder=" 所属机构" id="institution" type="text" class="form-control input-md" readonly="readonly" onclick="return load();">
+                            </div>
+                        </div>                          
+
+                        <div class="col-md-7 col-md-offset-0 animate-box">
+                            <div class="form-group">
+                                <select class="form-control input-md" id="address" onchange="return clickAddress();">
                                     <option>选择账户</option>
                                     <% for(var i=0; i<addressList.length;i++){%>
                                         <option><%= addressList[i].address %></option>
                                     <%}%>
                                 </select>
                             </div>                 
-                        </div>                        
+                        </div>
+
+                        <div class="fh5co-spacer fh5co-spacer-xxs"></div>
 
                         <div class="col-md-10">
                             <div class="table-responsive">
@@ -68,11 +67,11 @@
                                     <thead>
                                         <tr>
                                             <th>
-                                                资产数量
+                                                积分名称
                                             </th>
                                             <th>
-                                                资产期限
-                                            </th>                                           
+                                                积分余量
+                                            </th>                                       
                                         </tr>
                                     </thead>
                                     <tbody id='context'></tbody>
@@ -92,13 +91,43 @@
 function load() {
     document.getElementById('errMessage').innerHTML = "";    
 }
+
+//二级联动查询积分名称
+function clickAddress() {
+    document.getElementById('errMessage').innerHTML = "";
+    var add = $("#address").val();
+    if(add == "选择账户"){
+        $("#institution").val("");
+        return false;     
+    }
+    var data = {
+        "add": add
+    };
+    $.ajax({          
+        url: '/queryAssetByAddress',
+        type: 'post',
+        data: data,
+        dataType: 'json',
+        success: function(data) {
+            var ret = $.parseJSON(data);
+            if (ret.code == 200) {
+                var assetBack = $.parseJSON(ret.tips);
+                $("#institution").val(assetBack[0].institution);
+            } else {
+                $("#institution").val("");
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) { 
+            $("#institution").val("");
+        }
+    });  
+}
+
 $(function() {
     $("#query").click(function() {
         load();
-        var asset = $('#asset').val();
         var address = $('#address').val();
         var data = {
-            "asset": asset,
             "address": address
         };
         $.ajax({
@@ -113,16 +142,16 @@ $(function() {
                     var assetRes = $.parseJSON(ret.tips);
                     
                     //按有效期排序
-                    function getSortFun(order, sortBy) {
-                        var ordAlpah = (order == 'asc') ? '>' : '<';
-                        var sortFun = new Function('a', 'b', 'return a.' + sortBy + ordAlpah + 'b.' + sortBy + '?1:-1');
-                        return sortFun;
-                    }
-                    assetRes.UserBalance.sort(getSortFun('asc', 'Expire'));
+                    // function getSortFun(order, sortBy) {
+                    //     var ordAlpah = (order == 'asc') ? '>' : '<';
+                    //     var sortFun = new Function('a', 'b', 'return a.' + sortBy + ordAlpah + 'b.' + sortBy + '?1:-1');
+                    //     return sortFun;
+                    // }
+                    // assetRes.UserBalance.sort(getSortFun('asc', 'Expire'));
 
-                    for (i = 0; i < assetRes.UserBalance.length; i++) {
-                        vv = vv +   "<tr><td>" + assetRes.UserBalance[i].Balance + 
-                                    "</td><td>" + assetRes.UserBalance[i].Expire + 
+                    for (i = 0; i < assetRes.User.length; i++) {
+                        vv = vv +   "<tr><td>" + assetRes.User[i].Name + 
+                                    "</td><td>" + assetRes.User[i].Number + 
                                     "</td></tr>";
                     }
                     document.getElementById("context").innerHTML = vv;

@@ -2,6 +2,21 @@ var hfc = require('hfc');
 var chainUtil = require('../utils/chainUtil');
 var async = require('async');
 
+//query结果转化为正确json格式字符串
+function ascToStr(inStr) {
+    var len = inStr.length;
+    if (len % 2 !== 0) {
+        return "";
+    }
+    var charCode;
+    var outStr = [];
+    for (var i = 0; i < len; i = i + 2) {
+        charCode = parseInt(inStr.substr(i, 2), 16);
+        outStr.push(String.fromCharCode(charCode));
+    }
+    return outStr.join("");
+}
+
 module.exports = function (query) {
     /* GET query page. */
     query.route('/query').get(function (req, res) {
@@ -16,59 +31,26 @@ module.exports = function (query) {
             } else {
                 console.log("************query address*************");
                 var Address = global.dbHandel.getModel('address');
-                var Asset = global.dbHandel.getModel('asset');
                 var uname = req.session.user.name;
-                var iname = req.session.user.institution;                
-
-                async.parallel([
-                    function (callback) {
-                        Address.find({
-                            user: uname
-                        },
-                        function (err, doc) {
-                            if (err) {
-                                callback(err);
-                            } else if (!doc) {
-                                callback("no address");
-                            }
-                            else {
-                                callback(null, doc);
-                            }
-                        }).sort({ '_id': -1 });
-                    },
-                    function (callback) {
-                        Asset.find({
-                            institution: iname
-                        },
-                        function (err, doc) {
-                            if (err) {
-                                callback(err);
-                            } else if (!doc) {
-                                callback("no asset");
-                            }
-                            else {
-                                callback(null, doc);
-                            }
-                        }).sort({ '_id': -1 });
-                    }
-                ], function (err, result) {
-                    if (err != null) {
+                Address.find({
+                    user: uname
+                },
+                function (err, doc) {
+                    if (err || !doc) {
                         console.log("数据库操作失败");
                         res.render("query", {
                             user: req.session.user.name,
-                            title: '资产查询',
-                            assetList: [],
+                            title: '积分查询',
                             addressList: []
-                        }); //渲染query页面
+                        }); //渲染assign页面
                     } else {
                         res.render("query", {
                             user: req.session.user.name,
-                            title: '资产查询',
-                            assetList: result[1],
-                            addressList: result[0]
-                        }); //渲染query页面
+                            title: '积分查询',
+                            addressList: doc
+                        }); //渲染assign页面
                     }
-                });
+                }).sort({ '_id': -1 });
             }
         }
     });
@@ -77,26 +59,30 @@ module.exports = function (query) {
         var uname = req.session.user.name;
         var token = req.session.user.token;
         var address = req.body.address;
-        var asset = req.body.asset;
         var ajaxResult = {
             code: 1,
             tips: ""
         };
 
-        //query结果转化为正确json格式字符串
-        function ascToStr(inStr) {
-            var len = inStr.length;
-            if (len % 2 !== 0) {
-                return "";
-            }
-            var charCode;
-            var outStr = [];
-            for (var i = 0; i < len; i = i + 2) {
-                charCode = parseInt(inStr.substr(i, 2), 16);
-                outStr.push(String.fromCharCode(charCode));
-            }
-            return outStr.join("");
-        }
+        //从数据库获取CCID
+        var Asset = global.dbHandel.getModel('asset');
+        if (global.CCID === "") {
+            Asset.findOne({
+                institution: "&^%"
+            },
+            function (err, doc) {
+                if (err || !doc) {
+                    console.log("从数据库获取CCID失败");
+                    ajaxResult.code = 300;
+                    ajaxResult.tips = "从数据库获取CCID失败";
+                    ajaxResult = JSON.stringify(ajaxResult);
+                    res.json(ajaxResult);
+                    return;
+                } else {
+                    global.CCID = doc.asset;
+                }
+            });
+        }        
 
         //调用sdk
         var chain = chainUtil.getAssetChain("mychain");
@@ -109,33 +95,46 @@ module.exports = function (query) {
                 ajaxResult = JSON.stringify(ajaxResult);
                 res.json(ajaxResult);
                 return;
+            }else{
+                console.log("enroll " + uname + " ok");
+                user.getUserCert(null, function (err, userCert) {
+                    if (err) {
+                        console.log("获取证书失败");
+                        ajaxResult.code = 202;
+                        ajaxResult.tips = "获取证书失败";
+                        ajaxResult = JSON.stringify(ajaxResult);
+                        res.json(ajaxResult);
+                        return;
+                    }
+                    console.log("query begin");
+                    var req = {
+                        chaincodeID: global.CCID,
+                        fcn: "getUserById",
+                        args: [userCert.encode().toString('base64'), address],
+                        confidential: true,
+                        userCert: userCert
+                        
+                    };
+                    var tx = user.query(req);
+                    tx.on('complete', function (results) {
+                        console.log("query complete");
+                        console.log(ascToStr(results.result));
+                        ajaxResult.code = 200;
+                        ajaxResult.tips = ascToStr(results.result);
+                        ajaxResult = JSON.stringify(ajaxResult);
+                        res.json(ajaxResult);
+                        return;
+                    });
+                    tx.on('error', function (error) {
+                        console.log("query error");
+                        ajaxResult.code = 203;
+                        ajaxResult.tips = "积分查询失败";
+                        ajaxResult = JSON.stringify(ajaxResult);
+                        res.json(ajaxResult);
+                        return;
+                    });
+                });
             }
-            console.log("enroll " + uname + " ok");
-            console.log("query begin");
-            var req = {
-                chaincodeID: "f23b78574abebbbe42ddf37326a4acd9a33e38e1fc3f0ae54615609181445aa0",
-                fcn: "user",
-                args: [address, asset],
-                confidential: true,
-            };
-            var tx = user.query(req);
-            tx.on('complete', function (results) {
-                console.log("query complete");
-                console.log(ascToStr(results.result));
-                ajaxResult.code = 200;
-                ajaxResult.tips = ascToStr(results.result);
-                ajaxResult = JSON.stringify(ajaxResult);
-                res.json(ajaxResult);
-                return;
-            });
-            tx.on('error', function (error) {
-                console.log("query error");
-                ajaxResult.code = 202;
-                ajaxResult.tips = "查询资产失败";
-                ajaxResult = JSON.stringify(ajaxResult);
-                res.json(ajaxResult);
-                return;
-            });
         });
     });
 };

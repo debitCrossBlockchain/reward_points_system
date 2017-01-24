@@ -11,6 +11,8 @@ module.exports = {
     address:{ 
         user:{type:String,required:true},
         address:{type:String,required:true},
+        institution:{type:String,required:true},
+        asset:{type:String,required:true},
         time:{type:String}
     },
     tid:{ 
@@ -22,7 +24,7 @@ module.exports = {
     },
     asset:{ 
         institution:{type:String,required:true},
-        asset:{type:String,required:true},        
-        expire:{type:String,required:true}
+        asset:{type:String,required:true},
+        time:{type:String}
     },
 };

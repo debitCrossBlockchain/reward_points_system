@@ -3,12 +3,12 @@ module.exports = function (adminHome) {
     adminHome.get("/adminHome", function (req, res) {
         if (!req.session.user) {
             req.session.error = "请先登录";
-            res.redirect("/admin");
+            res.redirect("/login");
         } else {
-            if (req.session.user.type != "1" && req.session.user.type != "2") {
+            if (req.session.user.type != "1") {
                 req.session.user = null;
                 req.session.error = "请先登录";
-                res.redirect("/admin");
+                res.redirect("/login");
             } else {
                 res.render("adminHome", {
                     user: req.session.user.name,

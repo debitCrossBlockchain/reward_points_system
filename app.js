@@ -21,21 +21,27 @@ var assign = require('./routes/assign');
 var transfer = require('./routes/transfer');
 var query = require('./routes/query');
 var uuid = require('./routes/uuid');
-var admin = require('./routes/admin');
 var adminHome = require('./routes/adminHome');
 var deploy = require('./routes/deploy');
 var institution = require('./routes/institution');
 var insRegister = require('./routes/insRegister');
 var issue = require('./routes/issue');
 var restTest = require('./routes/restTest');
+var insHome = require('./routes/insHome');
+var insQuery = require('./routes/insQuery');
+var insTid = require('./routes/insTid');
+var expense = require('./routes/expense');
+var queryAsset = require('./routes/queryAsset');
+var queryAssetByAddress = require('./routes/queryAssetByAddress');
+
 
 var app = express();
 
 //db
 global.dbHandel = require('./database/dbHandel');
-//global.db = mongoose.createConnection("mongodb://localhost:27017/ynetbcdb");
+//global.db = mongoose.createConnection("mongodb://shensh:123$%^shensh@localhost:27027/ynetbcdb");
 
-global.blockchainJson;
+global.CCID = "";
 
 global.chainFlag = false;
 
@@ -62,27 +68,32 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 ///路由管理表
-index(app); //即为为路径 / 设置路由
-users(app); // 即为为路径 /users 设置路由
-home(app); //资产管理首页
-logout(app); // 即为为路径 /logout 设置路由
-login(app); // 即为为路径 /login 设置路由
-register(app); // 即为为路径 /register 设置路由
-userAddress(app); //账户管理
-queryAddress(app); //查询地址
-assign(app); //资产申请
-transfer(app); //资产转移
-query(app); //资产查询
+index(app); 
+users(app); 
+home(app); 
+logout(app); 
+login(app); 
+register(app); 
+userAddress(app); 
+queryAddress(app); 
+assign(app); 
+transfer(app); 
+query(app);
 uuid(app);
 restTest(app);
+queryAsset(app);
+queryAssetByAddress(app);
 
 //管理员功能
-admin(app);
 adminHome(app);
 deploy(app);
 institution(app);
 insRegister(app);
 issue(app);
+insHome(app);
+insQuery(app);
+insTid(app);
+expense(app);
 
 
 // catch 404 and forward to error handler
@@ -117,4 +128,4 @@ app.use(function(err, req, res, next) {
 });
 
 //module.exports = app;
-app.listen(8888);
+app.listen(9999);

@@ -13,7 +13,7 @@
 					<ul class="sf-menu" id="fh5co-primary-menu">
 						<li><a href="index" style="font-size:15px;">首页</a></li>
 						<li class="active">
-							<a href="home" style="font-size:15px;">资产管理</a>
+							<a href="home" style="font-size:15px;">积分购</a>
 					    </li>
 						<li><a href="#" style="font-size:15px;">关于我们</a></li>
 					</ul>
@@ -84,7 +84,7 @@ function displayResult() {
 }
 $(function() {
     $("#register").click(function() {
-        location.href = 'register';
+        location.href = "register";
     });
     $("#login").click(function() {
         load();
@@ -95,14 +95,20 @@ $(function() {
             "upwd": password
         };
         $.ajax({
-            url: '/login',
-            type: 'post',
+            url: "/login",
+            type: "post",
             data: data,
-            dataType: 'json',
+            dataType: "json",
             success: function(data) {
                 var ret = $.parseJSON(data);
-                if (ret.code == 200) {
-                    location.href = 'home';
+                if (ret.code === 200) {
+                    if (ret.tips === "1") {
+                        location.href = "adminHome";
+                    } else if (ret.tips === "2") {
+                        location.href = "insHome";
+                    } else {
+                        location.href = "home";
+                    }
                 } else {
                     document.getElementById('errMessage').innerHTML = ret.tips;
                 }

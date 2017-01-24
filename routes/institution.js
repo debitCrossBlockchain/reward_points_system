@@ -3,35 +3,37 @@ var chainUtil = require('../utils/chainUtil');
 var async = require('async');
 
 //结果排序
-function getSortFun(order, sortBy) {
-    var ordAlpah = (order == 'asc') ? '>' : '<';
-    var sortFun = new Function('a', 'b', 'return a.' + sortBy + ordAlpah + 'b.' + sortBy + '?1:-1');
-    return sortFun;
-}
+// function getSortFun(order, sortBy) {
+//     var ordAlpah = (order == 'asc') ? '>' : '<';
+//     var sortFun = new Function('a', 'b', 'return a.' + sortBy + ordAlpah + 'b.' + sortBy + '?1:-1');
+//     return sortFun;
+// }
 
 //sdk query结果转化为正常数字
-function ascToNum(inStr) {
+function ascToStr(inStr) {
     var len = inStr.length;
     if (len % 2 !== 0) {
         return "";
     }
-    var outStr = "";
-    for (var i = 0; i <= len / 2; i++) {
-        outStr += inStr.charAt(i * 2 + 1);
+    var charCode;
+    var outStr = [];
+    for (var i = 0; i < len; i = i + 2) {
+        charCode = parseInt(inStr.substr(i, 2), 16);
+        outStr.push(String.fromCharCode(charCode));
     }
-    return outStr;
+    return outStr.join("");
 }
 
 module.exports = function (institution) {
     institution.route('/institution').get(function (req, res) {
         if (!req.session.user) { //到达路径首先判断是否已经登录
             req.session.error = "请先登录";
-            res.redirect("/admin"); //未登录则重定向到 /admin 路径
+            res.redirect("/login"); //未登录则重定向到 /admin 路径
         } else {
-            if (req.session.user.type != "1" && req.session.user.type != "2") {
+            if (req.session.user.type != "1") {
                 req.session.user = null;
                 req.session.error = "请先登录";
-                res.redirect("/admin");
+                res.redirect("/login");
             } else {
                 console.log("************query institution*************");
                 var User = global.dbHandel.getModel('users');
@@ -68,6 +70,25 @@ module.exports = function (institution) {
             code: 1,
             tips: ""
         };
+
+        //从数据库获取CCID
+        if (global.CCID === "") {
+            Asset.findOne({
+                institution: "&^%"
+            },
+            function (err, doc) {
+                if (err || !doc) {
+                    console.log("从数据库获取CCID失败");
+                    ajaxResult.code = 300;
+                    ajaxResult.tips = "从数据库获取CCID失败";
+                    ajaxResult = JSON.stringify(ajaxResult);
+                    res.json(ajaxResult);
+                    return;
+                } else {
+                    global.CCID = doc.asset;
+                }
+            });
+        }        
 
         async.auto({
             //查询资产
@@ -107,7 +128,6 @@ module.exports = function (institution) {
                 docIns = arg.getIns;
                 token = docIns.token;
                 address = docIns.institutionAddress;
-                var resultSDK = [];
                 var chain = chainUtil.getAssetChain("mychain");
                 console.log("enrolling " + uname + "...");
                 chain.enroll(uname, token, function (err, organization) {
@@ -115,43 +135,26 @@ module.exports = function (institution) {
                         cb(err);
                     }else{
                         console.log("enroll " + uname + " ok");
-                        async.eachSeries(docAsset, function (item, callback) {
-                            item = item.toObject();
-                            console.log("query begin");
-                            var req = {
-                                chaincodeID: "f23b78574abebbbe42ddf37326a4acd9a33e38e1fc3f0ae54615609181445aa0",
-                                fcn: "organization",
-                                args: [address, item.asset],
-                                confidential: true,
-                            };
-                            var tx = organization.query(req);
-                            tx.on('complete', function (results) {
-                                console.log("query complete");
-                                resultSDK.push({
-                                    assetName: item.asset,
-                                    amount: ascToNum(results.result),
-                                    expire: item.expire,
-                                    id: item._id
-                                });
-                                callback(null);
-                            });
-                            tx.on('error', function (error) {
-                                console.log("query error");
-                                resultSDK.push({
-                                    assetName: item.asset,
-                                    amount: "",
-                                    expire: item.expire,
-                                    id: item._id
-                                });
-                                callback(null);
-                            });
-                        }, function (err) {
-                            if (err != null) {
-                                console.log(err);
+                        organization.getUserCert(null, function (err, organizationCert) {
+                            if (err) {
                                 cb(err);
-                            } else {
-                                resultSDK.sort(getSortFun('desc', 'id'));
-                                cb(null, resultSDK);
+                            }else{
+                                var req = {
+                                    chaincodeID: global.CCID,
+                                    fcn: "getInstitutionById",
+                                    args: [organizationCert.encode().toString('base64'), address],
+                                    confidential: true,
+                                    userCert: organizationCert
+                                };
+                                console.log("query begin");
+                                var tx = organization.query(req);
+                                tx.on('complete', function (results) {
+                                    console.log("query complete");
+                                    cb(null,ascToStr(results.result));
+                                });
+                                tx.on('error', function (error) {
+                                    cb("error");
+                                });
                             }
                         });
                     }
@@ -160,18 +163,18 @@ module.exports = function (institution) {
         },
         function (err, results) {
             if (err != null) {
-                console.log("机构资产查询失败");
+                console.log("机构积分查询失败");
                 console.log(err);
                 ajaxResult.code = 201;
-                ajaxResult.tips = "机构资产查询失败";
+                ajaxResult.tips = "机构积分查询失败";
                 ajaxResult = JSON.stringify(ajaxResult);
                 res.json(ajaxResult);
                 return;
             } else {
-                console.log("机构资产查询成功");
+                console.log("机构积分查询成功");
                 console.log(results.callSDK);
                 ajaxResult.code = 200;
-                ajaxResult.tips = JSON.stringify(results.callSDK);
+                ajaxResult.tips = results.callSDK;
                 ajaxResult = JSON.stringify(ajaxResult);
                 res.json(ajaxResult);
                 return;
