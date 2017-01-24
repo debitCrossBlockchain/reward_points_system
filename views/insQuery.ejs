@@ -14,7 +14,7 @@
 					<ul class="sf-menu" id="fh5co-primary-menu">
 						<li><a href="index" style="font-size:15px;">首页</a></li>
 						<li class="active">
-							<a href="home" style="font-size:15px;">积分购</a>
+							<a href="insHome" style="font-size:15px;">积分购</a>
 					    </li>
 						<li><a href="#" style="font-size:15px;">关于我们</a></li>
                         <li>
@@ -35,32 +35,9 @@
 
                         <div class="col-md-9">
                             <div class="input-group">
-                                <input type="button" class="btn btn-outline btn-md" id="query" value="积分查询"> 
-                                <span style="color:#FF0000;" id="errMessage"></span>
+                                <input type="button" style="VISIBILITY: hidden" class="btn btn-outline btn-md" id="query" value="积分查询"> 
                             </div>
                         </div>
-
-                        <div class="fh5co-spacer fh5co-spacer-xxs"></div>
-
-                        <div class="col-md-3 col-md-offset-0 animate-box">
-                            <div class="form-group">
-                                <input placeholder=" 所属机构" id="institution" type="text" class="form-control input-md" readonly="readonly" onclick="return load();">
-                            </div>
-                        </div>                          
-
-                        <div class="col-md-7 col-md-offset-0 animate-box">
-                            <div class="form-group">
-                                <select class="form-control input-md" id="address" onchange="return clickAddress();">
-                                    <option>选择账户</option>
-                                    <% for(var i=0; i<addressList.length;i++){%>
-                                        <option><%= addressList[i].address %></option>
-                                    <%}%>
-                                </select>
-                            </div>                 
-                        </div>
-
-                        <div class="fh5co-spacer fh5co-spacer-xxs"></div>
-
                         <div class="col-md-10">
                             <div class="table-responsive">
                                 <table class="table table-striped">
@@ -71,7 +48,7 @@
                                             </th>
                                             <th>
                                                 积分余量
-                                            </th>                                       
+                                            </th>                                          
                                         </tr>
                                     </thead>
                                     <tbody id='context'></tbody>
@@ -89,49 +66,15 @@
 
 <script type="text/javascript">
 function load() {
-    document.getElementById('errMessage').innerHTML = "";    
+    $("#query").click();   
 }
-
-//二级联动查询积分名称
-function clickAddress() {
-    document.getElementById('errMessage').innerHTML = "";
-    var add = $("#address").val();
-    if(add == "选择账户"){
-        $("#institution").val("");
-        return false;     
-    }
-    var data = {
-        "add": add
-    };
-    $.ajax({          
-        url: '/queryAssetByAddress',
-        type: 'post',
-        data: data,
-        dataType: 'json',
-        success: function(data) {
-            var ret = $.parseJSON(data);
-            if (ret.code == 200) {
-                var assetBack = $.parseJSON(ret.tips);
-                $("#institution").val(assetBack[0].institution);
-            } else {
-                $("#institution").val("");
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) { 
-            $("#institution").val("");
-        }
-    });  
-}
-
 $(function() {
     $("#query").click(function() {
-        load();
-        var address = $('#address').val();
         var data = {
-            "address": address
+            "asset": "test"
         };
         $.ajax({
-            url: '/query',
+            url: '/insQuery',
             type: 'post',
             data: data,
             dataType: 'json',
@@ -149,22 +92,18 @@ $(function() {
                     // }
                     // assetRes.UserBalance.sort(getSortFun('asc', 'Expire'));
 
-                    for (i = 0; i < assetRes.User.length; i++) {
-                        vv = vv +   "<tr><td>" + assetRes.User[i].Name + 
-                                    "</td><td>" + assetRes.User[i].Number + 
+                    for (i = 0; i < assetRes.Institution.length; i++) {
+                        vv = vv +   "<tr><td>" + assetRes.Institution[i].Name + 
+                                    "</td><td>" + assetRes.Institution[i].RestNumber +
                                     "</td></tr>";
                     }
                     document.getElementById("context").innerHTML = vv;
-                    document.getElementById('errMessage').innerHTML = "";
                 } else {
                     document.getElementById("context").innerHTML = "";
-                    document.getElementById('errMessage').innerHTML = ret.tips;
                     //alert("资产查询失败，错误：" + ret.tips);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                document.getElementById("context").innerHTML = "";
-                document.getElementById('errMessage').innerHTML = errorThrown;
                 //alert("资产查询失败，错误：" + errorThrown);
             }
         });

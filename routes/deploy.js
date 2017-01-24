@@ -6,12 +6,12 @@ module.exports = function (deploy) {
     deploy.route('/deploy').get(function (req, res) {
         if (!req.session.user) { //到达路径首先判断是否已经登录
             req.session.error = "请先登录";
-            res.redirect("/admin"); //未登录则重定向到 /admin 路径
+            res.redirect("/login"); //未登录则重定向到 /admin 路径
         } else {
-            if (req.session.user.type != "1" && req.session.user.type != "2") {
+            if (req.session.user.type != "1") {
                 req.session.user = null;
                 req.session.error = "请先登录";
-                res.redirect("/admin");
+                res.redirect("/login");
             } else {
                 res.render("deploy", {
                     user: req.session.user.name,
@@ -29,6 +29,11 @@ module.exports = function (deploy) {
             code: 1,
             tips: ""
         };
+
+        var Asset = global.dbHandel.getModel('asset');
+        var conditions;
+        var update;
+        var options; 
 
         //调用sdk
         var chain = chainUtil.getAssetChain("mychain");
@@ -56,20 +61,35 @@ module.exports = function (deploy) {
                     fcn: "init",
                     args: [],
                     confidential: true,
-                    metadata: new Buffer("assigner"),
                     chaincodePath: path
                 };
                 var tx = admin.deploy(deployRequest);
-                tx.on('complete', function (results) {
+                tx.on('submitted', function (results) {
                     console.log("CC部署成功");
-                    ajaxResult.code = 200;
-                    ajaxResult.tips = results.chaincodeID;
-                    ajaxResult = JSON.stringify(ajaxResult);
-                    res.json(ajaxResult);
-                    return;
+                    global.CCID = results.chaincodeID;
+                    conditions = { institution: "&^%" };
+                    update = { $set: { asset: global.CCID } };
+                    options = { upsert: true };
+                    Asset.update(conditions, update, options,
+                    function (err) {
+                        if (err) {
+                            ajaxResult.code = 200;
+                            ajaxResult.tips = "CC部署成功，但CCID存库失败，请联系相关人员解决";
+                            ajaxResult = JSON.stringify(ajaxResult);
+                            res.json(ajaxResult);
+                            return;
+                        } else {
+                            ajaxResult.code = 200;
+                            ajaxResult.tips = results.chaincodeID;
+                            ajaxResult = JSON.stringify(ajaxResult);
+                            res.json(ajaxResult);
+                            return;
+                        }
+                    });
                 });
                 tx.on('error', function (error) {
                     console.log("CC部署失败");
+                    global.CCID = "";
                     ajaxResult.code = 203;
                     ajaxResult.tips = "CC部署失败";
                     ajaxResult = JSON.stringify(ajaxResult);

@@ -1,6 +1,6 @@
 var hfc = require('hfc');
 var chainUtil = require('../utils/chainUtil');
-var restUrl = "121.42.49.127:7000"
+var restUrl = "127.0.0.1:3000"
 
 module.exports = function (restTest) {
     /* GET assign page. */
@@ -32,30 +32,12 @@ module.exports = function (restTest) {
 
         //调用sdk
         var blockInfo = hfc.newBlockInfo(restUrl);
-        if(op === "peers"){
-            blockInfo.getPeers(function(err,result){
-                if(err){
-                    console.log("获取节点信息失败");
-                    ajaxResult.code = 201;
-                    ajaxResult.tips = "获取节点信息失败";
-                    ajaxResult = JSON.stringify(ajaxResult);
-                    res.json(ajaxResult);
-                    return;                    
-                } else {
-                    console.log("获取节点信息成功");
-                    ajaxResult.code = 200;
-                    ajaxResult.tips = result;
-                    ajaxResult = JSON.stringify(ajaxResult);
-                    res.json(ajaxResult);
-                    return;                  
-                }
-            });
-        }
+
         if(op === "chain"){
             blockInfo.getChainInfo(function(err,result){
                 if(err){
                     console.log("获取整链信息失败");
-                    ajaxResult.code = 202;
+                    ajaxResult.code = 201;
                     ajaxResult.tips = "获取整链信息失败";
                     ajaxResult = JSON.stringify(ajaxResult);
                     res.json(ajaxResult);
@@ -70,11 +52,12 @@ module.exports = function (restTest) {
                 }
             });
         }
+
         if(op === "block"){
             blockInfo.getBlockInfo(args,function(err,result){
                 if(err){
                     console.log("获取区块信息失败");
-                    ajaxResult.code = 203;
+                    ajaxResult.code = 202;
                     ajaxResult.tips = "获取区块信息失败";
                     ajaxResult = JSON.stringify(ajaxResult);
                     res.json(ajaxResult);
@@ -89,11 +72,52 @@ module.exports = function (restTest) {
                 }
             });
         }
+
+        if(op === "blockCount"){
+            blockInfo.getBlockCount(function(err,result){
+                if(err){
+                    console.log("获取区块数量失败");
+                    ajaxResult.code = 203;
+                    ajaxResult.tips = "获取区块数量失败";
+                    ajaxResult = JSON.stringify(ajaxResult);
+                    res.json(ajaxResult);
+                    return;                    
+                } else {
+                    console.log("获取区块数量成功");
+                    ajaxResult.code = 200;
+                    ajaxResult.tips = result;
+                    ajaxResult = JSON.stringify(ajaxResult);
+                    res.json(ajaxResult);
+                    return;                  
+                }
+            });
+        }
+
+        if(op === "peers"){
+            blockInfo.getPeers(function(err,result){
+                if(err){
+                    console.log("获取节点信息失败");
+                    ajaxResult.code = 204;
+                    ajaxResult.tips = "获取节点信息失败";
+                    ajaxResult = JSON.stringify(ajaxResult);
+                    res.json(ajaxResult);
+                    return;                    
+                } else {
+                    console.log("获取节点信息成功");
+                    ajaxResult.code = 200;
+                    ajaxResult.tips = result;
+                    ajaxResult = JSON.stringify(ajaxResult);
+                    res.json(ajaxResult);
+                    return;                  
+                }
+            });
+        }        
+
         if(op === "tx"){
             blockInfo.getTxInfo(args,function(err,result){
                 if(err){
                     console.log("获取交易信息失败");
-                    ajaxResult.code = 204;
+                    ajaxResult.code = 205;
                     ajaxResult.tips = "获取交易信息失败";
                     ajaxResult = JSON.stringify(ajaxResult);
                     res.json(ajaxResult);

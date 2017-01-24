@@ -13,7 +13,7 @@
 					<ul class="sf-menu" id="fh5co-primary-menu">
 						<li><a href="index" style="font-size:15px;">首页</a></li>
 						<li class="active">
-							<a href="home" style="font-size:15px;">资产管理</a>
+							<a href="home" style="font-size:15px;">积分购</a>
 					    </li>
 						<li><a href="#" style="font-size:15px;">关于我们</a></li>
 					</ul>
@@ -27,21 +27,6 @@
 				<div class="row">
 						<form class="form-horizontal" method="post">
                             <div class="col-md-8 col-md-offset-3 animate-box">
-                                
-                                <div class="col-md-7">
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-anchor fa-fw"></i></span>  
-                                        <select class="form-control input-md" style="color:#9D9D9D;" id="institution" onmousedown="return changeColor();">
-                                            <option>选择机构</option>
-                                            <% for(var i=0; i<institutionList.length;i++){%>
-                                                <option><%= institutionList[i].name %></option>
-                                            <%}%>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="fh5co-spacer fh5co-spacer-xxs"></div>   
-
                                 <div class="col-md-7">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
@@ -74,7 +59,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <input type="button" class="btn btn-primary btn-md" id="register" value="注册">
-                                        <input type="reset" class="btn btn-outline btn-md"  id="reset" value="重置" onclick="return changeColorRe();">
+                                        <input type="reset" class="btn btn-outline btn-md"  id="reset" value="重置" onclick="return load();">
                                     </div>	
 							    </div>
                             </div>
@@ -93,18 +78,6 @@
 <script type="text/javascript">
 function load() {
     document.getElementById('errMessage').innerHTML = "";    
-}
-function changeColor(){
-   document.getElementById('errMessage').innerHTML = "";
-   var spanElement = document.getElementById("institution");  
-   spanElement.setAttribute("style","color:#5B5B5B;");  
-   spanElement.style.cssText = "color:#5B5B5B;";  
-}
-function changeColorRe(){
-    document.getElementById('errMessage').innerHTML = "";
-    var spanElement = document.getElementById("institution");  
-    spanElement.setAttribute("style","color:#9D9D9D;");  
-    spanElement.style.cssText = "color:#9D9D9D;"; 
 }
 function displayResult() {
     var x;
@@ -126,9 +99,7 @@ $(function() {
         $txtUserPwd = $('#password'),
         password = $.trim($txtUserPwd.val()),
         $txtUserRePwd = $('#passwordRe'),
-        passwordRe = $.trim($txtUserRePwd.val()),
-        $txtInstitution = $('#institution'),
-        institution = $txtInstitution.val();
+        passwordRe = $.trim($txtUserRePwd.val());
         if (username.length == 0) {
             document.getElementById('errMessage').innerHTML = "用户名不能为空";
             $txtUserName.focus();
@@ -149,16 +120,9 @@ $(function() {
             $txtUserPwd.focus();
             return false;
         }
-        if (institution == "选择机构") {
-            document.getElementById('errMessage').innerHTML = "请选择机构";
-            $txtInstitution.focus();
-            return false;
-        } 
-
         var data = {
             "uname": username,
-            "upwd": password,
-            "iname": institution
+            "upwd": password
         };
         $.ajax({
             url: '/register',

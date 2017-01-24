@@ -1,7 +1,9 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var models = require("./models");
-conn = mongoose.createConnection("mongodb://localhost:27017/ynetbcdb");
+var config = require('../config.js');
+
+conn = mongoose.createConnection(config.ynetbcdb);
 
 for(var m in models){ 
     conn.model(m,new Schema(models[m]),m);

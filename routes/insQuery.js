@@ -17,48 +17,30 @@ function ascToStr(inStr) {
     return outStr.join("");
 }
 
-module.exports = function (query) {
+module.exports = function (insQuery) {
     /* GET query page. */
-    query.route('/query').get(function (req, res) {
+    insQuery.route('/insQuery').get(function (req, res) {
         if (!req.session.user) { //到达路径首先判断是否已经登录
             req.session.error = "请先登录";
             res.redirect("/login"); //未登录则重定向到 /login 路径
         } else {
-            if (req.session.user.type != "3") {
+            if (req.session.user.type != "2") {
                 req.session.user = null;
                 req.session.error = "请先登录";
                 res.redirect("/login");
             } else {
-                console.log("************query address*************");
-                var Address = global.dbHandel.getModel('address');
-                var uname = req.session.user.name;
-                Address.find({
-                    user: uname
-                },
-                function (err, doc) {
-                    if (err || !doc) {
-                        console.log("数据库操作失败");
-                        res.render("query", {
-                            user: req.session.user.name,
-                            title: '积分查询',
-                            addressList: []
-                        }); //渲染assign页面
-                    } else {
-                        res.render("query", {
-                            user: req.session.user.name,
-                            title: '积分查询',
-                            addressList: doc
-                        }); //渲染assign页面
-                    }
-                }).sort({ '_id': -1 });
+                res.render("insQuery", {
+                    user: req.session.user.name,
+                    title: '积分查询'
+                }); //渲染insQuery页面
             }
         }
     });
-    query.route('/query').post(function (req, res) {
+    insQuery.route('/insQuery').post(function (req, res) {
         console.log("************query asset*************");
-        var uname = req.session.user.name;
-        var token = req.session.user.token;
-        var address = req.body.address;
+        var iname = req.session.user.name;
+        var itoken = req.session.user.token;
+        var iaddress = req.session.user.institutionAddress;
         var ajaxResult = {
             code: 1,
             tips: ""
@@ -66,8 +48,8 @@ module.exports = function (query) {
 
         //调用sdk
         var chain = chainUtil.getAssetChain("mychain");
-        console.log("enrolling " + uname + "...");
-        chain.enroll(uname, token, function (err, user) {
+        console.log("enrolling " + iname + "...");
+        chain.enroll(iname, itoken, function (err, organization) {
             if (err) {
                 console.log("用户登录失败");
                 ajaxResult.code = 201;
@@ -76,8 +58,8 @@ module.exports = function (query) {
                 res.json(ajaxResult);
                 return;
             }else{
-                console.log("enroll " + uname + " ok");
-                user.getUserCert(null, function (err, userCert) {
+                console.log("enroll " + iname + " ok");
+                organization.getUserCert(null, function (err, organizationCert) {
                     if (err) {
                         console.log("获取证书失败");
                         ajaxResult.code = 202;
@@ -86,16 +68,15 @@ module.exports = function (query) {
                         res.json(ajaxResult);
                         return;
                     }
-                    console.log("query begin");
                     var req = {
                         chaincodeID: global.CCID,
-                        fcn: "getUserById",
-                        args: [userCert.encode().toString('base64'), address],
+                        fcn: "getInstitutionById",
+                        args: [organizationCert.encode().toString('base64'), iaddress],
                         confidential: true,
-                        userCert: userCert
-                        
+                        userCert: organizationCert
                     };
-                    var tx = user.query(req);
+                    console.log("query begin");
+                    var tx = organization.query(req);
                     tx.on('complete', function (results) {
                         console.log("query complete");
                         console.log(ascToStr(results.result));

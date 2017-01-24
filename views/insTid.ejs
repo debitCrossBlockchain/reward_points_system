@@ -14,7 +14,7 @@
 					<ul class="sf-menu" id="fh5co-primary-menu">
 						<li><a href="index" style="font-size:15px;">首页</a></li>
 						<li class="active">
-							<a href="home" style="font-size:15px;">积分购</a>
+							<a href="insHome" style="font-size:15px;">积分购</a>
 							<!-- <ul class="fh5co-sub-menu">
 							 		<li><a href="#" style="font-size:15px;">1元购</a></li> 
 									</ul> -->
@@ -51,7 +51,7 @@
                                     <tbody>    
                                         <% for(var i=0; i<tidList.length;i++){%>
                                             <tr>
-                                                <td><a href='tiddetail?tid=<%= tidList[i].tid %>'><%= tidList[i].tid %></a></td>
+                                                <td><a href='insTiddetail?tid=<%= tidList[i].tid %>'><%= tidList[i].tid %></a></td>
                                                 <td><%= tidList[i].tips %></td>
                                                 <td><%= tidList[i].time %></td>
                                             </tr>

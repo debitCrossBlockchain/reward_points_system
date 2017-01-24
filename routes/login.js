@@ -33,14 +33,10 @@ module.exports = function (login) {
                     req.session.error = "密码错误";
                     ajaxResult.code = 203;
                     ajaxResult.tips = "密码错误";
-                } else if (doc.type != "3") {
-                    console.log("用户类型错误");
-                    req.session.error = "用户类型错误";
-                    ajaxResult.code = 204;
-                    ajaxResult.tips = "用户类型错误";
                 } else { //信息匹配成功，则将此对象（匹配到的user) 赋给session.user，并返回成功
                     req.session.user = doc;
                     ajaxResult.code = 200;
+                    ajaxResult.tips = doc.type;
                 }
             }
             ajaxResult = JSON.stringify(ajaxResult);

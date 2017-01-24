@@ -14,7 +14,7 @@
 					<ul class="sf-menu" id="fh5co-primary-menu">
 						<li><a href="index" style="font-size:15px;">首页</a></li>
 						<li class="active">
-							<a href="adminHome" style="font-size:15px;">资产管理</a>
+							<a href="adminHome" style="font-size:15px;">积分购</a>
 					    </li>
 						<li><a href="#" style="font-size:15px;">关于我们</a></li>
                         <li>
@@ -41,9 +41,10 @@
                             <div class="col-md-8 col-md-offset-4 animate-box">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <input type="button" class="btn btn-primary btn-md " id="peers" value="节点">
                                         <input type="button" class="btn btn-primary btn-md " id="chain" value="整链">
                                         <input type="button" class="btn btn-primary btn-md " id="block" value="区块">
+                                        <input type="button" class="btn btn-primary btn-md " id="blockCount" value="块数">
+                                        <input type="button" class="btn btn-primary btn-md " id="peers" value="节点">
                                         <input type="button" class="btn btn-primary btn-md " id="tx" value="交易">
                                         <input type="reset" class="btn btn-outline btn-md"  id="reset" value="重置" onclick="return load();">
                                     </div>	
@@ -71,31 +72,6 @@ function load() {
 $(function() {
     $("#reset").click(function() {
         load();
-    });
-    $("#peers").click(function() {
-        load();
-        var data = {
-            "op": "peers",
-            "args":"1"
-        };
-        $.ajax({
-            url: '/restTest',
-            type: 'post',
-            data: data,
-            dataType: 'json',
-            success: function(data) {
-                var ret = $.parseJSON(data);
-                if (ret.code == 200) {
-                    document.getElementById('textarea').innerHTML = JSON.stringify(ret.tips,null,2);
-                } else {
-                    document.getElementById('errMessage').innerHTML = ret.tips;
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                //alert('error ' + textStatus + " " + errorThrown);
-                document.getElementById('errMessage').innerHTML = errorThrown;
-            }
-        });
     });
     $("#chain").click(function() {
         load();
@@ -126,7 +102,7 @@ $(function() {
         load();
         var data = {
             "op": "block",
-            "args":"3"
+            "args":"2"
         };
         $.ajax({
             url: '/restTest',
@@ -147,11 +123,61 @@ $(function() {
             }
         });
     });
+    $("#blockCount").click(function() {
+        load();
+        var data = {
+            "op": "blockCount",
+            "args":"1"
+        };
+        $.ajax({
+            url: '/restTest',
+            type: 'post',
+            data: data,
+            dataType: 'json',
+            success: function(data) {
+                var ret = $.parseJSON(data);
+                if (ret.code == 200) {
+                    document.getElementById('textarea').innerHTML = JSON.stringify(ret.tips,null,2);
+                } else {
+                    document.getElementById('errMessage').innerHTML = ret.tips;
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                //alert('error ' + textStatus + " " + errorThrown);
+                document.getElementById('errMessage').innerHTML = errorThrown;
+            }
+        });
+    });    
+    $("#peers").click(function() {
+        load();
+        var data = {
+            "op": "peers",
+            "args":"1"
+        };
+        $.ajax({
+            url: '/restTest',
+            type: 'post',
+            data: data,
+            dataType: 'json',
+            success: function(data) {
+                var ret = $.parseJSON(data);
+                if (ret.code == 200) {
+                    document.getElementById('textarea').innerHTML = JSON.stringify(ret.tips,null,2);
+                } else {
+                    document.getElementById('errMessage').innerHTML = ret.tips;
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                //alert('error ' + textStatus + " " + errorThrown);
+                document.getElementById('errMessage').innerHTML = errorThrown;
+            }
+        });
+    });    
     $("#tx").click(function() {
         load();
         var data = {
             "op": "tx",
-            "args":"202b255a-5ea6-4897-ae1f-708975cd0172"
+            "args":"c8165a2e-884d-4021-a184-3b42220613e7"
         };
         $.ajax({
             url: '/restTest',

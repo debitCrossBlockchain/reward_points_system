@@ -8,12 +8,12 @@ module.exports = function (insRegister) {
     insRegister.route("/insRegister").get(function (req, res) {
         if (!req.session.user) {
             req.session.error = "请先登录";
-            res.redirect("/admin");
+            res.redirect("/login");
         } else {
             if (req.session.user.type != "1") {
                 req.session.user = null;
                 req.session.error = "请先登录";
-                res.redirect("/admin");
+                res.redirect("/login");
             } else {
                 res.render("insRegister", {
                     user: req.session.user.name,
@@ -52,7 +52,7 @@ module.exports = function (insRegister) {
             //调用sdk
             callSDK: function (callback) {
                 var chain = chainUtil.getAssetChain("mychain");
-                chain.enroll("admin", "Xurw3yU9zI0l", function (err, admin) {
+                chain.enroll(global.adminName, global.adminToken, function (err, admin) {
                     if (err) {
                         callback(err);
                     }else{
@@ -61,7 +61,7 @@ module.exports = function (insRegister) {
                         // registrationRequest
                         var registrationRequest = {
                             enrollmentID: uname,
-                            affiliation: "yc"
+                            affiliation: global.affiliation
                         };
                         chain.registerAndEnroll(registrationRequest, function (error, user) {
                             if (error) {

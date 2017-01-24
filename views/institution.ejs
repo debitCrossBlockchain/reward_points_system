@@ -14,7 +14,7 @@
                 <ul class="sf-menu" id="fh5co-primary-menu">
                     <li><a href="index" style="font-size:15px;">首页</a></li>
                     <li class="active">
-                        <a href="adminHome" style="font-size:15px;">资产管理</a>
+                        <a href="adminHome" style="font-size:15px;">积分购</a>
                         <!-- <ul class="fh5co-sub-menu">
                                 <li><a href="#" style="font-size:15px;">1元购</a></li> 
                                 </ul> -->
@@ -40,8 +40,8 @@
                 <div class="col-md-12 animate-box">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <input type="button" class="btn btn-outline btn-md" id="add" value="机构注册" onclick="window.location.href='insRegister'">
-                            <input type="button" class="btn btn-outline btn-md" id="query" value="机构列表">
+                            <input type="button" class="btn btn-outline btn-md" id="add" value="添加机构" onclick="window.location.href='insRegister'">
+                            <input type="button" style="VISIBILITY: hidden" class="btn btn-outline btn-md" id="query" value="机构列表">
                         </div>	
                     </div>
                 </div>                   
@@ -60,14 +60,11 @@
                                                 <thead>
                                                     <tr>
                                                         <th>
-                                                            资产名称
+                                                            积分名称
                                                         </th>
                                                         <th>
-                                                            资产数量
-                                                        </th>
-                                                        <th>
-                                                            资产期限
-                                                        </th>                                                           
+                                                            积分余量
+                                                        </th>                                                       
                                                     </tr>
                                                 </thead>
                                                 <tbody id="<%= 'context'+i %>"></tbody>
@@ -130,8 +127,10 @@ $(function() {
                     if (ret.code == 200) {
                         var vv = "";
                         var assetList = $.parseJSON(ret.tips);
-                        for (j = 0; j < assetList.length; j++) {
-                            vv = vv + "<tr><td>" + assetList[j].assetName + "</td><td>" + assetList[j].amount + "</td><td>" + assetList[j].expire + "</td></tr>";
+                        for (j = 0; j < assetList.Institution.length; j++) {
+                            vv = vv + "<tr><td>" + assetList.Institution[j].Name + 
+                                      "</td><td>" + assetList.Institution[j].RestNumber +
+                                      "</td></tr>";
                         }
                         document.getElementById("context"+i).innerHTML = vv;
                     } else {

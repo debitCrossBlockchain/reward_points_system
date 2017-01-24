@@ -14,7 +14,7 @@
 					<ul class="sf-menu" id="fh5co-primary-menu">
 						<li><a href="index" style="font-size:15px;">首页</a></li>
 						<li class="active">
-							<a href="home" style="font-size:15px;">资产管理</a>
+							<a href="insHome" style="font-size:15px;">积分购</a>
 					    </li>
 						<li><a href="#" style="font-size:15px;">关于我们</a></li>
                         <li>
@@ -30,13 +30,12 @@
 
 		<div id="fh5co-main">
 			<div class="container">
-                <div class="fh5co-spacer fh5co-spacer-md"></div>
 				<div class="row">
 						<form class="form-horizontal" method="post">                     
                                 <div class="col-md-3 col-md-offset-1 animate-box">
                                     <div class="form-group">                         
-                                        <select class="form-control input-md" style="color:#9D9D9D;" id="asset" onmousedown="return changeColor1();">
-                                            <option>选择资产</option>
+                                        <select class="form-control input-md" style="color:#9D9D9D;" id="asset" onmousedown="return changeColor();">
+                                            <option>选择积分</option>
                                             <% for(var i=0; i<assetList.length;i++){%>
                                                 <option><%= assetList[i].asset %></option>
                                             <%}%>
@@ -45,18 +44,23 @@
                                 </div>
                                 <div class="col-md-3 col-md-offset-2 animate-box">
                                     <div class="form-group">
-                                        <input placeholder=" 资产数量" id="amount" type="text" class="form-control input-md" onclick="return load();">
+                                        <input placeholder=" 积分数量" id="amount" type="text" class="form-control input-md" onclick="return load();">
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-md-offset-1 animate-box">
+                                    <div class="form-group">
+                                        <input placeholder=" 用户" id="target" type="text" class="form-control input-md" onclick="return load();">
+                                    </div>
+                                </div>
+                                <div class="col-md-8 col-md-offset-1 animate-box">
+                                    <div class="form-group">
+                                        <input placeholder=" 用户账户" id="targetAddress" type="text" class="form-control input-md" onclick="return load();">
                                     </div>
                                 </div> 
                                 <div class="col-md-8 col-md-offset-1 animate-box">
-                                    <div class="form-group">                         
-                                        <select class="form-control input-md" style="color:#9D9D9D;" id="address" onmousedown="return changeColor2();">
-                                            <option>选择账户</option>
-                                            <% for(var i=0; i<addressList.length;i++){%>
-                                                <option><%= addressList[i].address %></option>
-                                            <%}%>
-                                        </select>
-                                    </div>	
+                                    <div class="form-group">
+                                        <input placeholder=" 发放事由" id="assignReason" type="text" class="form-control input-md" onclick="return load();">
+                                    </div>
                                 </div>
                                 <div class="col-md-8 col-md-offset-4 animate-box">
                                     <div class="col-md-10">
@@ -66,7 +70,7 @@
                                 <div class="col-md-8 col-md-offset-4 animate-box">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <input type="button" class="btn btn-primary btn-md " id="assign" value="申请">
+                                            <input type="button" class="btn btn-primary btn-md " id="assign" value="发放">
                                             <input type="reset" class="btn btn-outline btn-md"  id="reset" value="重置" onclick="return changeColorRe();">
                                         </div>	
                                     </div>
@@ -84,15 +88,9 @@
 function load() {
     document.getElementById('errMessage').innerHTML = "";
 }
-function changeColor1(){
+function changeColor(){
    document.getElementById('errMessage').innerHTML = "";
    var spanElement = document.getElementById("asset");  
-   spanElement.setAttribute("style","color:#5B5B5B;");  
-   spanElement.style.cssText = "color:#5B5B5B;";  
-}
-function changeColor2(){
-   document.getElementById('errMessage').innerHTML = "";
-   var spanElement = document.getElementById("address");  
    spanElement.setAttribute("style","color:#5B5B5B;");  
    spanElement.style.cssText = "color:#5B5B5B;";  
 }
@@ -100,10 +98,7 @@ function changeColorRe(){
     document.getElementById('errMessage').innerHTML = "";
     var spanElement = document.getElementById("asset");  
     spanElement.setAttribute("style","color:#9D9D9D;");  
-    spanElement.style.cssText = "color:#9D9D9D;"; 
-    spanElement = document.getElementById("address");  
-    spanElement.setAttribute("style","color:#9D9D9D;");  
-    spanElement.style.cssText = "color:#9D9D9D;";  
+    spanElement.style.cssText = "color:#9D9D9D;";
 }
 $(function() {
     $("#reset").click(function() {
@@ -111,36 +106,52 @@ $(function() {
     });
     $("#assign").click(function() {
         load();
-        var $txtAmount = $('#amount'),
+        var $txtAsset = $('#asset'),
+        asset = $txtAsset.val(),
+        $txtAmount = $('#amount'),
         amount = $.trim($txtAmount.val()),
-        $txtAddress = $('#address'),
-        address = $txtAddress.val();
-        $txtAsset = $('#asset'),
-        asset = $txtAsset.val();
-        if (address == "选择资产") {
-            document.getElementById('errMessage').innerHTML = "请选择资产";
+        $txtTarget = $('#target'),
+        target = $.trim($txtTarget.val()),
+        $txtTargetAddress = $('#targetAddress'),
+        targetAddress = $.trim($txtTargetAddress.val()),
+        $txtAssignReason = $('#assignReason'),
+        assignReason = $.trim($txtAssignReason.val());        
+        if (asset == "选择积分") {
+            document.getElementById('errMessage').innerHTML = "请选择积分";
             $txtAsset.focus();
             return false;
         }                 
         if (amount.length == 0) {
-            document.getElementById('errMessage').innerHTML = "资产数量不能为空";
+            document.getElementById('errMessage').innerHTML = "积分数量不能为空";
             $txtAmount.focus();
             return false;
         }
         if (isNaN(Number(amount))) {
-            document.getElementById('errMessage').innerHTML = "资产数量错误";
+            document.getElementById('errMessage').innerHTML = "积分数量错误";
             $txtAmount.focus();
             return false;
         }
-        if (address == "选择账户") {
-            document.getElementById('errMessage').innerHTML = "请选择账户";
-            $txtAddress.focus();
+        if (Number(amount) <= 0) {
+            document.getElementById('errMessage').innerHTML = "积分数量不能为负";
+            $txtAmount.focus();
+            return false;
+        }
+        if (target.length == 0) {
+            document.getElementById('errMessage').innerHTML = "用户不能为空";
+            $txtTarget.focus();
+            return false;
+        }
+        if (targetAddress.length == 0) {
+            document.getElementById('errMessage').innerHTML = "用户账户不能为空";
+            $txtTargetAddress.focus();
             return false;
         }       
         var data = {
-            "amount": amount,
             "asset": asset,
-            "address": address
+            "amount": amount,
+            "target": target,
+            "targetAddress": targetAddress,
+            "assignReason": assignReason
         };
         $.ajax({
             url: '/assign',
@@ -150,7 +161,7 @@ $(function() {
             success: function(data) {
                 var ret = $.parseJSON(data);
                 if (ret.code == 200) {
-                    alert("资产申请成功");
+                    alert("积分发放成功");
                 } else {
                     document.getElementById('errMessage').innerHTML = ret.tips;
                 }

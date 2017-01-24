@@ -1,16 +1,16 @@
-module.exports = function (adminHome) {
+module.exports = function (insHome) {
     /* GET adminHome page. */
-    adminHome.get("/adminHome", function (req, res) {
+    insHome.get("/insHome", function (req, res) {
         if (!req.session.user) {
             req.session.error = "请先登录";
             res.redirect("/login");
         } else {
-            if (req.session.user.type != "1") {
+            if (req.session.user.type != "2") {
                 req.session.user = null;
                 req.session.error = "请先登录";
                 res.redirect("/login");
             } else {
-                res.render("adminHome", {
+                res.render("insHome", {
                     user: req.session.user.name,
                     title: '易诚互动区块链'
                 });
