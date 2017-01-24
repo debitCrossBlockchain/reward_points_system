@@ -71,25 +71,6 @@ module.exports = function (institution) {
             tips: ""
         };
 
-        //从数据库获取CCID
-        if (global.CCID === "") {
-            Asset.findOne({
-                institution: "&^%"
-            },
-            function (err, doc) {
-                if (err || !doc) {
-                    console.log("从数据库获取CCID失败");
-                    ajaxResult.code = 300;
-                    ajaxResult.tips = "从数据库获取CCID失败";
-                    ajaxResult = JSON.stringify(ajaxResult);
-                    res.json(ajaxResult);
-                    return;
-                } else {
-                    global.CCID = doc.asset;
-                }
-            });
-        }        
-
         async.auto({
             //查询资产
             getAsset: function (cb) {

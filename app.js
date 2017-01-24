@@ -40,10 +40,42 @@ var app = express();
 //db
 global.dbHandel = require('./database/dbHandel');
 //global.db = mongoose.createConnection("mongodb://shensh:123$%^shensh@localhost:27027/ynetbcdb");
-
-global.CCID = "";
+var config = require('./config.js');
 
 global.chainFlag = false;
+global.CCID = "";
+global.adminName = config.adminName;
+global.adminToken = config.adminToken;
+global.affiliation = config.affiliation;
+
+//从数据库获取CCID
+var Asset = global.dbHandel.getModel('asset');
+Asset.findOne({
+    institution: "&^%"
+},
+function (err, doc) {
+    if (err || !doc) {
+        console.log("从配置文件读取CCID");
+        global.CCID = config.CCID;
+    } else {
+        console.log("从数据库读取CCID");
+        global.CCID = doc.asset;      
+    }
+});
+
+//将yc_admin管理员Token写库
+var Users = global.dbHandel.getModel('users');
+var conditions = { type: "1" };
+var update = { $set: { name: global.adminName, password: "admin", token: global.adminToken } };
+var options = { upsert: true };
+Users.update(conditions, update, options,
+function (err) {
+    if (err) {
+        console.log("yc_admin管理员Token写库失败");
+    } else {
+        console.log("yc_admin管理员Token写库成功");
+    }
+});
 
 app.use(session({
     secret: 'secret',

@@ -52,7 +52,7 @@ module.exports = function (insRegister) {
             //调用sdk
             callSDK: function (callback) {
                 var chain = chainUtil.getAssetChain("mychain");
-                chain.enroll("yc_admin", "uCaKQkyzqigj", function (err, admin) {
+                chain.enroll(global.adminName, global.adminToken, function (err, admin) {
                     if (err) {
                         callback(err);
                     }else{
@@ -61,7 +61,7 @@ module.exports = function (insRegister) {
                         // registrationRequest
                         var registrationRequest = {
                             enrollmentID: uname,
-                            affiliation: "yc"
+                            affiliation: global.affiliation
                         };
                         chain.registerAndEnroll(registrationRequest, function (error, user) {
                             if (error) {

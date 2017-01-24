@@ -56,26 +56,6 @@ module.exports = function(transfer) {
             tips: ""
         };
 
-        //从数据库获取CCID
-        var Asset = global.dbHandel.getModel('asset');
-        if (global.CCID === "") {
-            Asset.findOne({
-                institution: "&^%"
-            },
-            function (err, doc) {
-                if (err || !doc) {
-                    console.log("从数据库获取CCID失败");
-                    ajaxResult.code = 300;
-                    ajaxResult.tips = "从数据库获取CCID失败";
-                    ajaxResult = JSON.stringify(ajaxResult);
-                    res.json(ajaxResult);
-                    return;
-                } else {
-                    global.CCID = doc.asset;
-                }
-            });
-        }                
-
         async.series([
             //校验接收人信息
             function (callback) {
