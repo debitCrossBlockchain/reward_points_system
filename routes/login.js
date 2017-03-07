@@ -1,10 +1,33 @@
 var request = require('request');
 module.exports = function (login) {
     /* GET login page. */
-    login.route("/login").get(function (req, res) { // 到达此路径则渲染login文件，并传出title值供 login.html使用
-        res.render("login", {
-            title: '用户登录'
-        });
+    login.route("/login").get(function (req, res) { 
+        if (!req.session.user) { //首先判断是否已经登录
+            res.render("login", {
+                title: '用户登录'
+            });
+        } else {
+            if (req.session.user.type == "1") {
+                res.render("adminHome", {
+                    user: req.session.user.name,
+                    title: '易诚互动区块链'
+                });
+            } else if (req.session.user.type == "2") {
+                res.render("insHome", {
+                    user: req.session.user.name,
+                    title: '易诚互动区块链'
+                });
+            } else if (req.session.user.type == "3") {
+                res.render("home", {
+                    user: req.session.user.name,
+                    title: '易诚互动区块链'
+                });
+            } else {
+                res.render("login", {
+                    title: '用户登录'
+                });
+            }
+        }
     });
     login.route("/login").post(function (req, res) { // 从此路径检测到post方式则进行post数据的处理操作
         console.log("************login*************");

@@ -14,28 +14,67 @@ module.exports = function (expense) {
                 req.session.error = "请先登录";
                 res.redirect("/login");
             } else {
-                console.log("************query address*************");
-                var Address = global.dbHandel.getModel('address');
+                var ins = req.query.institution;
+                var asset = req.query.asset;
                 var uname = req.session.user.name;
-                Address.find({
-                    user: uname
-                },
-                function (err, doc) {
-                    if (err || !doc) {
-                        console.log("数据库操作失败");
+                var Address = global.dbHandel.getModel('address');
+                var Goods = global.dbHandel.getModel('goods');
+                async.parallel([
+                    //查询账户
+                    function (callback) {
+                        console.log("************query address*************");
+                        Address.find({
+                            user: uname,
+                            institution: ins,
+                            asset: asset
+                        },
+                        function (err, doc) {
+                            if (err || !doc) {
+                                console.log("数据库操作失败");
+                                callback("数据库操作失败");
+                            } else {
+                                callback(null,doc);
+                            }
+                        }).sort({ '_id': -1 });
+                    },
+                    //查询商品
+                    function (callback) {
+                        console.log("************query goods*************");
+                        Goods.find({
+                            institution: ins,
+                            asset: asset
+                        },
+                        function (err, doc) {
+                            if (err || !doc) {
+                                console.log("数据库操作失败");
+                                callback("数据库操作失败");
+                            } else {
+                                callback(null,doc);
+                            }
+                        }).sort({ '_id': -1 });
+                    }
+                ], function (err, result) {
+                    if (err != null) {
+                        console.log(err);
                         res.render("expense", {
                             user: req.session.user.name,
-                            title: '积分消费',
-                            addressList: []
-                        }); //渲染assign页面
+                            title: '积分购',
+                            ins: ins,
+                            asset: asset,
+                            addressList: [],
+                            goodsList: []
+                        }); //渲染expense页面
                     } else {
                         res.render("expense", {
                             user: req.session.user.name,
-                            title: '积分消费',
-                            addressList: doc
-                        }); //渲染assign页面
+                            title: '积分购',
+                            ins: ins,
+                            asset: asset,                            
+                            addressList: result[0],
+                            goodsList: result[1]
+                        }); //渲染expense页面
                     }
-                }).sort({ '_id': -1 });
+                });
             }
         }
     });

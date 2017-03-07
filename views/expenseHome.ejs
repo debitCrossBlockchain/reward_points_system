@@ -1,0 +1,146 @@
+<% include header.html %>
+
+    <!-- START #fh5co-header -->
+    <div class="fh5co-spacer fh5co-spacer-xs"></div>
+    <div class="fh5co-spacer fh5co-spacer-xs"></div>
+        <header id="fh5co-header-section" role="header" class="" >
+            <div class="container">
+                <!-- <div id="fh5co-menu-logo"> -->
+                <!-- START #fh5co-logo -->
+                <!--<h1 id="fh5co-logo" class="pull-left"><a href="index.html"><img src="images/logo.png" alt="EchBlockChain"></a></h1>-->
+				<h1 id="fh5co-logo" class="pull-left"><a href="index" style="color:#f86942;">易诚互动区块链</a></h1>
+				<!-- START #fh5co-menu-wrap -->
+				<nav id="fh5co-menu-wrap" role="navigation">					
+					<ul class="sf-menu" id="fh5co-primary-menu">
+						<li><a href="index" style="font-size:15px;">首页</a></li>
+						<li class="active">
+							<a href="home" style="font-size:15px;">积分购</a>
+					    </li>
+						<li><a href="#" style="font-size:15px;">关于我们</a></li>
+                        <li>
+                            <a href="#" class="fh5co-sub-ddown" style="font-size:15px;"><%=user%></a>
+                                <ul class="fh5co-sub-menu">
+                                <li><a href="logout" style="font-size:15px;">安全退出</a></li> 
+                            </ul>
+						</li>                          
+					</ul>
+				</nav>
+            </div>
+        </header>
+
+		<div id="fh5co-main">
+			<div class="container">
+				<div class="row">                        
+                    <form class="form-horizontal" method="post">
+                        <div class="fh5co-spacer fh5co-spacer-md"></div>
+                        <div class="col-md-8 col-md-offset-1 animate-box">
+                            <div class="form-group">
+                                <select class="form-control input-md" style="color:#9D9D9D;" id="institution" onchange="return clickIns();" onmousedown="return changeColor();">
+                                    <option>选择机构</option>
+                                    <% for(var i=0; i<insList.length;i++){%>
+                                        <option><%= insList[i].name %></option>
+                                    <%}%>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-8 col-md-offset-1 animate-box">
+                            <div class="form-group">
+                                <select class="form-control input-md" style="color:#9D9D9D;" id="asset" onmousedown="return changeColor();">
+                                    <option>选择积分</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-8 col-md-offset-4 animate-box">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="button" class="btn btn-primary btn-md " id="enter" value="进入商城">
+                                    <input type="reset" class="btn btn-outline btn-md"  id="reset" value="重置" onclick="return changeColorRe();">
+                                </div>	
+                            </div>
+                        </div>
+                    </form>                                                        		
+				</div><!-- END row -->
+                <div class="fh5co-spacer fh5co-spacer-sm"></div>
+
+			</div><!-- END container -->		
+		</div><!-- END fhtco-main -->                   
+
+<% include footer.html %>
+
+<script type="text/javascript">
+function changeColor(){
+   var spanElement = document.getElementById("institution");  
+   spanElement.setAttribute("style","color:#5B5B5B;");  
+   spanElement.style.cssText = "color:#5B5B5B;";
+   spanElement = document.getElementById("asset");  
+   spanElement.setAttribute("style","color:#5B5B5B;");  
+   spanElement.style.cssText = "color:#5B5B5B;";   
+}
+function changeColorRe(){
+    var spanElement = document.getElementById("institution");  
+    spanElement.setAttribute("style","color:#9D9D9D;");  
+    spanElement.style.cssText = "color:#9D9D9D;";
+    spanElement = document.getElementById("asset");  
+    spanElement.setAttribute("style","color:#9D9D9D;");  
+    spanElement.style.cssText = "color:#9D9D9D;";      
+}
+
+//二级联动显示机构发行的积分
+function clickIns() {  
+    var ins = $("#institution").val();
+    var data = {
+        "ins": ins
+    };
+    var asset = document.getElementById("asset");
+    $.ajax({          
+        url: '/queryAsset',
+        type: 'post',
+        data: data,
+        dataType: 'json',
+        success: function(data) {
+            var ret = $.parseJSON(data);
+            if (ret.code == 200) {
+                var assetList = $.parseJSON(ret.tips);
+                //清空数组  
+                asset.length = 0;
+                var option = new Option("选择积分");
+                asset.add(option);
+                for (var i = 1; i <= assetList.length; i++) {
+                    var xText = assetList[i - 1].asset;
+                    var option = new Option(xText);
+                    asset.add(option);
+                }
+            } else {
+                //清空数组  
+                asset.length = 0;
+                var option = new Option("选择积分");
+                asset.add(option);
+                //alert("账户查询失败，错误：" + ret.tips);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            //清空数组  
+            asset.length = 0;
+            var option = new Option("选择积分");
+            asset.add(option);
+            //alert("账户查询失败，错误：" + ret.tips);
+        }
+    });  
+}
+
+$(function() {
+    $("#enter").click(function() {
+        var $txtInstitution = $('#institution'),
+        institution = $txtInstitution.val(),        
+        $txtAsset = $('#asset'),
+        asset = $txtAsset.val();
+        if (institution == "选择机构") {
+            return false;
+        }
+        if (asset == "选择积分"){
+            return false; 
+        }
+        location.href = "expense?institution=" + institution + "&asset=" + asset;
+    });
+});
+</script>  

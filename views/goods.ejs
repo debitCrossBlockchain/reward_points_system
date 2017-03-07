@@ -1,0 +1,216 @@
+<% include header.html %>
+
+		<!-- START #fh5co-header -->
+		<div class="fh5co-spacer fh5co-spacer-xs"></div>
+		<div class="fh5co-spacer fh5co-spacer-xs"></div>
+		<header id="fh5co-header-section" role="header" class="">
+			<div class="container">
+				<!-- <div id="fh5co-menu-logo"> -->
+				<!-- START #fh5co-logo -->
+				<!--<h1 id="fh5co-logo" class="pull-left"><a href="index.html"><img src="images/logo.png" alt="EchBlockChain"></a></h1>-->
+				<h1 id="fh5co-logo" class="pull-left"><a href="index" style="color:#f86942;">易诚互动区块链</a></h1>
+				<!-- START #fh5co-menu-wrap -->
+				<nav id="fh5co-menu-wrap" role="navigation">
+					<ul class="sf-menu" id="fh5co-primary-menu">
+						<li><a href="index" style="font-size:15px;">首页</a></li>
+						<li class="active">
+							<a href="insHome" style="font-size:15px;">积分购</a>
+							<!-- <ul class="fh5co-sub-menu">
+							 		<li><a href="#" style="font-size:15px;">1元购</a></li> 
+									</ul> -->
+						</li>
+						<li><a href="#" style="font-size:15px;">关于我们</a></li>
+                        <li>
+                            <a href="#" class="fh5co-sub-ddown" style="font-size:15px;"><%=user%></a>
+                                <ul class="fh5co-sub-menu">
+                                <li><a href="logout" style="font-size:15px;">安全退出</a></li> 
+                            </ul>
+						</li>                          
+						<!--<li class="fh5co-special"><a href="contact.html">Get started</a></li>-->
+					</ul>
+				</nav>
+				<!-- </div> -->
+			</div>
+		</header>
+
+		<div id="fh5co-main">
+			<div class="container">
+			
+				<div class="row">
+                    <form class="form-horizontal" method="post">
+                        <div class="col-md-2 col-md-offset-1 animate-box">         
+                            <div class="form-group">    
+                                <select class="form-control input-md" id="asset" onmousedown="return changeColor();">
+                                    <option>选择积分</option>
+                                    <% for(var i=0; i<assetList.length;i++){%>
+                                        <option><%= assetList[i].asset %></option>
+                                    <%}%>
+                                </select>                                 
+                            </div>                 
+                        </div>                    
+                        <div class="col-md-2 col-md-offset-1 animate-box">
+                            <div class="form-group">
+                                <input placeholder=" 商品名称" id="goodsName" type="text" class="form-control input-md">
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-md-offset-1 animate-box">
+                            <div class="form-group">
+                                <input placeholder=" 商品单价" id="price" type="text" class="form-control input-md">
+                            </div>
+                        </div>                                      
+                        <div class="col-md-6 col-md-offset-4 animate-box">
+                            <div class="form-group">
+                                <input type="button" class="btn btn-primary btn-md " id="add" value="添加商品">
+                                <input type="reset" class="btn btn-outline btn-md"  id="reset" value="重置" onclick="return changeColorRe();">
+                                <input type="button" style="VISIBILITY: hidden" class="btn btn-outline btn-md" id="query" value="商品列表">
+                            </div>	
+                        </div>
+                        <div class="col-md-8 col-md-offset-4 animate-box">
+                            <div class="col-md-10">
+                                <p style="color:#FF0000;"><span id="errMessage"></span></p>
+                            </div>
+                        </div>                                              
+                        <div class="col-md-12 animate-box">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                所属积分
+                                            </th>                                        
+                                            <th>
+                                                商品名称
+                                            </th>
+                                            <th>
+                                                商品单价
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id='context'></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </form>
+				</div>
+
+			</div>
+			<!-- END container -->
+		</div>
+		<!-- END fhtco-main -->
+
+<% include footer.html %>
+
+<script type="text/javascript">
+function load() {
+    document.getElementById('errMessage').innerHTML = "";
+    $("#query").click();
+}
+function changeColor(){
+   document.getElementById('errMessage').innerHTML = "";
+   var spanElement = document.getElementById("asset");  
+   spanElement.setAttribute("style","color:#5B5B5B;");  
+   spanElement.style.cssText = "color:#5B5B5B;";  
+}
+function changeColorRe(){
+    document.getElementById('errMessage').innerHTML = "";
+    var spanElement = document.getElementById("asset");  
+    spanElement.setAttribute("style","color:#9D9D9D;");  
+    spanElement.style.cssText = "color:#9D9D9D;";
+}
+
+$(function() {
+    $("#reset").click(function() {
+        document.getElementById('errMessage').innerHTML = "";
+    });
+    //添加商品
+    $("#add").click(function() {
+        document.getElementById('errMessage').innerHTML = "";
+        var $txtAsset = $('#asset'),
+        asset = $txtAsset.val(),
+        $txtGoodsName = $('#goodsName'),
+        goodsName = $.trim($txtGoodsName.val()),
+        $txtPrice = $('#price'),
+        price = $.trim($txtPrice.val());
+        if (asset == "选择积分") {
+            document.getElementById('errMessage').innerHTML = "请选择积分";
+            $txtAsset.focus();
+            return false;
+        }
+        if (goodsName.length == 0) {
+            document.getElementById('errMessage').innerHTML = "商品名称不能为空";
+            $txtGoodsName.focus();
+            return false;
+        }
+        if (price.length == 0) {
+            document.getElementById('errMessage').innerHTML = "商品单价不能为空";
+            $txtPrice.focus();
+            return false;
+        }
+        if (isNaN(Number(price))) {
+            document.getElementById('errMessage').innerHTML = "商品单价错误";
+            $txtPrice.focus();
+            return false;
+        }
+        if (Number(price) <= 0) {
+            document.getElementById('errMessage').innerHTML = "商品单价不能为负";
+            $txtPrice.focus();
+            return false;
+        }                        
+        var data = {
+            "asset": asset,
+            "goodsName": goodsName,
+            "price": price
+        };
+        $.ajax({
+            url: '/goods',
+            type: 'post',
+            data: data,
+            dataType: 'json',
+            success: function(data) {
+                var ret = $.parseJSON(data);
+                if (ret.code == 200) {
+                    alert("添加商品成功");
+                    $("#query").click();
+                } else {
+                    document.getElementById('errMessage').innerHTML = ret.tips;
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                document.getElementById('errMessage').innerHTML = errorThrown;
+            }
+        });
+    });
+
+    //商品查询显示
+    $("#query").click(function() {
+        var data = {
+            "username": "test"
+        };
+        $.ajax({
+            url: '/queryGoods',
+            type: 'post',
+            data: data,
+            dataType: 'json',
+            success: function(data) {
+                var ret = $.parseJSON(data);
+                if (ret.code == 200) {
+                    var vv = "";
+                    var goodsList = $.parseJSON(ret.tips);
+                    for (i = 0; i < goodsList.length; i++) {
+                        vv = vv + "<tr><td>" + goodsList[i].asset + 
+                                  "</td><td>" + goodsList[i].name +
+                                  "</td><td>" + goodsList[i].price +
+                                  "</td></tr>";
+                    }
+                    document.getElementById("context").innerHTML = vv;
+                } else {
+                    //alert("商品查询失败，错误：" + ret.tips);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                //alert("商品查询失败，错误：" + errorThrown);
+            }
+        });
+    });
+});
+</script>

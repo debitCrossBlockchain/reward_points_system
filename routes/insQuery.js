@@ -79,12 +79,42 @@ module.exports = function (insQuery) {
                     var tx = organization.query(req);
                     tx.on('complete', function (results) {
                         console.log("query complete");
-                        console.log(ascToStr(results.result));
-                        ajaxResult.code = 200;
-                        ajaxResult.tips = ascToStr(results.result);
-                        ajaxResult = JSON.stringify(ajaxResult);
-                        res.json(ajaxResult);
-                        return;
+                        var Asset = global.dbHandel.getModel('asset');
+                        var inputRaw = ascToStr(results.result);
+                        var input = JSON.parse(inputRaw).Institution;
+                        var output = [];
+                        async.eachSeries(input, function (item, callback) {
+                            Asset.findOne({
+                                institution: iname,
+                                asset: item.Name
+                            },
+                            function (err, doc) {
+                                if (err || !doc) {
+                                    output.push({
+                                        assetName: item.Name,
+                                        amount: item.RestNumber,
+                                        rate: ""
+                                    });
+                                    callback("query rate err");
+                                } else {
+                                    output.push({
+                                        assetName: item.Name,
+                                        amount: item.RestNumber,
+                                        rate: doc.rate
+                                    });
+                                    callback(null);
+                                }
+                            });
+                        }, function (err) {
+                            if (err != null) {
+                                console.log(err);
+                            }
+                            ajaxResult.code = 200;
+                            ajaxResult.tips = JSON.stringify(output);
+                            ajaxResult = JSON.stringify(ajaxResult);
+                            res.json(ajaxResult);
+                            return;                                
+                        });
                     });
                     tx.on('error', function (error) {
                         console.log("query error");
