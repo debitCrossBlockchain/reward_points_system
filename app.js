@@ -33,7 +33,12 @@ var insTid = require('./routes/insTid');
 var expense = require('./routes/expense');
 var queryAsset = require('./routes/queryAsset');
 var queryAssetByAddress = require('./routes/queryAssetByAddress');
-
+var expenseHome = require('./routes/expenseHome');
+var goods = require('./routes/goods');
+var queryGoods = require('./routes/queryGoods');
+var queryGoodsPrice = require('./routes/queryGoodsPrice');
+var autoFillTransferForm = require('./routes/autoFillTransferForm');
+var queryAddressByAsset = require('./routes/queryAddressByAsset');
 
 var app = express();
 
@@ -115,6 +120,10 @@ uuid(app);
 restTest(app);
 queryAsset(app);
 queryAssetByAddress(app);
+expense(app);
+expenseHome(app);
+queryGoodsPrice(app);
+autoFillTransferForm(app);
 
 //管理员功能
 adminHome(app);
@@ -125,8 +134,9 @@ issue(app);
 insHome(app);
 insQuery(app);
 insTid(app);
-expense(app);
-
+goods(app);
+queryGoods(app);
+queryAddressByAsset(app);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

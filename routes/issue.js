@@ -27,6 +27,7 @@ module.exports = function (issue) {
         var address = req.session.user.institutionAddress;
         var assetName = req.body.assetName;
         var amount = req.body.amount;
+        var rate = req.body.rate;
         var ajaxResult = {
             code: 1,
             tips: ""
@@ -108,12 +109,24 @@ module.exports = function (issue) {
             function (arg, callback) {
                 var op = arg.callSDK;
                 if (op === "update") {
-                    callback(null, "update asset ok");
+                    console.log("************update asset*************");
+                    var conditions = { institution: iname, asset: assetName };
+                    var update = { $set: { rate: rate } };
+                    var options = { upsert: false };
+                    Asset.update(conditions, update, options,
+                    function (err) {
+                        if (err) {
+                            callback(err);
+                        } else {
+                            callback(null, "update asset ok");
+                        }
+                    });
                 } else {
                     console.log("************insert asset*************");
                     Asset.create({
                         "institution": iname,
                         "asset": assetName,
+                        "rate": rate,
                         "time": new Date().toLocaleString()
                     },
                     function (err, results) {

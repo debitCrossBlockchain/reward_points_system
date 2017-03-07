@@ -1,4 +1,6 @@
-var http = require('http');
+//var http = require('http');
+var hfc = require('hfc');
+var config = require('../config.js');
 
 module.exports = function(uuid) {
     /* GET tid page. */
@@ -43,40 +45,57 @@ module.exports = function(uuid) {
             req.session.error = "请先登录";
             res.redirect("/login"); //未登录则重定向到 /login 路径
         } else {
+            var blockInfo = hfc.newBlockInfo(config.peerAddr);
             //获取get参数
             var tid = req.query.tid;
-            var opt = {
-                method: "GET",
-                host: "127.0.0.1",
-                port: 7000,
-                path: '/transactions/' + tid
-            };
-            //http请求
-            var req = http.request(opt, function (serverFeedback) {
-                serverFeedback.setEncoding('utf8');
-                if (serverFeedback.statusCode == 200) {
-                    var body = "";
-                    serverFeedback.on('data', function (chunk) {
-                        body += chunk;
-                    });
-                    serverFeedback.on('end', function () {
-                        resData = JSON.parse(body);
-                        res.render('tiddetail', {
-                            title: "交易记录",
-                            jsonRes: resData
-                        });
-                        return;
-                    });
-                } else {
+            blockInfo.getTxInfo(tid, function (err, result) {
+                if (err) {
+                    console.log("获取交易信息失败");
                     res.send(250, "error");
+                    return;
+                } else {
+                    console.log("获取交易信息成功");
+                    resData = result;
+                    res.render('tiddetail', {
+                        title: "交易记录",
+                        jsonRes: resData
+                    });
                     return;
                 }
             });
-            req.on('error', function (e) {
-                console.log("Got error: " + e.message);
-                res.send(500, "error");
-            });
-            req.end();
+
+            // var opt = {
+            //     method: "GET",
+            //     host: "127.0.0.1",
+            //     port: 7000,
+            //     path: '/transactions/' + tid
+            // };
+            // //http请求
+            // var req = http.request(opt, function (serverFeedback) {
+            //     serverFeedback.setEncoding('utf8');
+            //     if (serverFeedback.statusCode == 200) {
+            //         var body = "";
+            //         serverFeedback.on('data', function (chunk) {
+            //             body += chunk;
+            //         });
+            //         serverFeedback.on('end', function () {
+            //             resData = JSON.parse(body);
+            //             res.render('tiddetail', {
+            //                 title: "交易记录",
+            //                 jsonRes: resData
+            //             });
+            //             return;
+            //         });
+            //     } else {
+            //         res.send(250, "error");
+            //         return;
+            //     }
+            // });
+            // req.on('error', function (e) {
+            //     console.log("Got error: " + e.message);
+            //     res.send(500, "error");
+            // });
+            // req.end();
         }
     });
 };

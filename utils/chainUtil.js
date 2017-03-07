@@ -12,8 +12,8 @@ function getAssetChain(name) {
         }else{
             chain.setKeyValStore(hfc.newMongoKeyValStore(config.keyStore));
         }
-        chain.setMemberServicesUrl(config.caAddr);
-        chain.addPeer(config.peerAddr);
+        chain.setMemberServicesUrl("grpc://" + config.caAddr);
+        chain.addPeer("grpc://" + config.peerAddr);
         chain.setDevMode(config.devMode);
         chain.setDeployWaitTime(parseInt(config.deployWait));
         chain.setInvokeWaitTime(parseInt(config.invokeWait));

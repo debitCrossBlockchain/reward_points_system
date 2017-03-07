@@ -52,29 +52,29 @@
                                     <input placeholder=" 积分数量" id="amount" type="text" class="form-control input-md" onclick="return load();">
                                 </div>
                             </div>
+                            <div class="col-md-8 col-md-offset-1 animate-box">
+                                <div class="form-group">
+                                    <input placeholder=" 接收人账户" id="targetAddress" type="text" class="form-control input-md" onchange="return autoDo();" onclick="return load();">
+                                </div>
+                            </div>                            
                             <div class="col-md-3 col-md-offset-1 animate-box">
                                 <div class="form-group">
-                                    <input placeholder=" 接收人" id="target" type="text" class="form-control input-md" onclick="return load();">
+                                    <input placeholder=" 接收人" id="target" type="text" class="form-control input-md"  readonly="readonly" onclick="return load();">
                                 </div>
                             </div>
                             <div class="col-md-3 col-md-offset-2 animate-box">
                                 <div class="form-group">
-                                    <input placeholder=" 接收人积分名称" id="targetAsset" type="text" class="form-control input-md" onclick="return load();">
+                                    <input placeholder=" 接收人积分名称" id="targetAsset" type="text" class="form-control input-md" readonly="readonly" onclick="return load();">
                                 </div>
                             </div>
                             <div class="col-md-3 col-md-offset-1 animate-box">
                                 <div class="form-group">
-                                    <input placeholder=" 兑换比率" id="rate" type="text" class="form-control input-md" onclick="return load();">
+                                    <input placeholder=" 兑换比率" id="rate" type="text" class="form-control input-md" readonly="readonly" onclick="return load();">
                                 </div>
                             </div>
                             <div class="col-md-3 col-md-offset-2 animate-box">
                                 <div class="form-group">
                                     <input placeholder=" 备注" id="remark" type="text" class="form-control input-md" onclick="return load();">
-                                </div>
-                            </div>                                                       
-                            <div class="col-md-8 col-md-offset-1 animate-box">
-                                <div class="form-group">
-                                    <input placeholder=" 接收人账户" id="targetAddress" type="text" class="form-control input-md" onclick="return load();">
                                 </div>
                             </div>
                             <div class="col-md-8 col-md-offset-4 animate-box">
@@ -100,6 +100,8 @@
 <% include footer.html %>
 
 <script type="text/javascript">
+window["insOwn"] = "";
+window["assetOwn"] = "";
 function load() {
     document.getElementById('errMessage').innerHTML = "";
 }
@@ -121,6 +123,9 @@ function clickAddress() {
     var add = $("#address").val();
     if(add == "选择账户"){
         $("#asset").val("");
+        $("#rate").val("");
+        assetOwn = "";
+        insOwn = "";
         return false;     
     }
     var data = {
@@ -136,15 +141,59 @@ function clickAddress() {
             if (ret.code == 200) {
                 var assetBack = $.parseJSON(ret.tips);
                 $("#asset").val(assetBack[0].asset);
+                assetOwn = assetBack[0].asset;
+                insOwn = assetBack[0].institution;
+                autoDo();
             } else {
                 $("#asset").val("");
+                $("#rate").val("");
+                assetOwn = "";
+                insOwn = "";
             }
         },
         error: function(jqXHR, textStatus, errorThrown) { 
             $("#asset").val("");
+            $("#rate").val("");
+            assetOwn = "";
+            insOwn = "";
         }
-    });  
+    });
 }
+
+//二级联动查询接收人信息，计算兑换比率
+function autoDo() {
+    var addressTarget = $.trim($('#targetAddress').val());
+    var data = {
+        "addressTarget": addressTarget,
+        "insOwn": insOwn,
+        "assetOwn": assetOwn
+    };
+    $.ajax({          
+        url: '/autoFillTransferForm',
+        type: 'post',
+        data: data,
+        dataType: 'json',
+        success: function(data) {
+            var ret = $.parseJSON(data);
+            if (ret.code == 200) {
+                var assetBack = $.parseJSON(ret.tips1);
+                $("#target").val(assetBack.user);
+                $("#targetAsset").val(assetBack.asset);
+                $("#rate").val(ret.tips2);
+            } else {
+                $("#target").val("");
+                $("#targetAsset").val("");
+                $("#rate").val("");
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) { 
+            $("#target").val("");
+            $("#targetAsset").val("");
+            $("#rate").val("");
+        }
+    });
+}
+
 
 $(function() {
     $("#reset").click(function() {

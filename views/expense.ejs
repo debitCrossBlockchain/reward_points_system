@@ -34,37 +34,47 @@
                     <form class="form-horizontal" method="post">
                         <div class="col-md-8 col-md-offset-1 animate-box">
                             <div class="form-group">
-                                <select class="form-control input-md" style="color:#9D9D9D;" id="address" onchange="return clickAddress();" onmousedown="return changeColor();">
-                                    <option>选择账户</option>
-                                    <% for(var i=0; i<addressList.length;i++){%>
-                                        <option><%= addressList[i].address %></option>
+                                <select class="form-control input-md" style="color:#9D9D9D;" id="goods" onblur="return autoDo();" onchange="return clickGoods();" onmousedown="return changeColor1();">
+                                    <option>选择商品</option>
+                                    <% for(var i=0; i<goodsList.length;i++){%>
+                                        <option><%= goodsList[i].name %></option>
                                     <%}%>
                                 </select>
-                            </div>                 
-                        </div>                    
+                            </div>
+                        </div>
                         <div class="col-md-3 col-md-offset-1 animate-box">
                             <div class="form-group">
-                                <input placeholder=" 所属机构" id="institution" type="text" class="form-control input-md" readonly="readonly" onclick="return load();">
+                                <input placeholder=" 商品单价" id="price" type="text" class="form-control input-md" readonly="readonly">
                             </div>
                         </div>                            
                         <div class="col-md-3 col-md-offset-2 animate-box">
                             <div class="form-group">
-                                <input placeholder=" 积分名称" id="asset" type="text" class="form-control input-md" readonly="readonly" onclick="return load();">
+                                <input placeholder=" 商品数量" id="count" type="text" class="form-control input-md" onchange = "return autoDo();" onblur="return autoDo();" onclick="return load();">
                             </div>
-                        </div> 
+                        </div>
                         <div class="col-md-3 col-md-offset-1 animate-box">
                             <div class="form-group">
-                                <input placeholder=" 积分数量" id="amount" type="text" class="form-control input-md" onclick="return load();">
+                                <input placeholder=" 积分数量" id="amount" type="text" class="form-control input-md" readonly="readonly">
                             </div>
                         </div>
                         <div class="col-md-3 col-md-offset-2 animate-box">
                             <div class="form-group">
                                 <input placeholder=" 备注" id="remark" type="text" class="form-control input-md" onclick="return load();">
                             </div>
+                        </div>                                                                    
+                        <div class="col-md-8 col-md-offset-1 animate-box">
+                            <div class="form-group">
+                                <select class="form-control input-md" style="color:#9D9D9D;" id="address" onmousedown="return changeColor2();">
+                                    <option>选择账户</option>
+                                    <% for(var i=0; i<addressList.length;i++){%>
+                                        <option><%= addressList[i].address %></option>
+                                    <%}%>
+                                </select>
+                            </div>
                         </div>                        
                         <div class="col-md-8 col-md-offset-1 animate-box">
                             <div class="form-group">
-                                <input placeholder=" 消费事由" id="expenseReason" type="text" class="form-control input-md" onclick="return load();">
+                                <input placeholder=" 消费事由" id="expenseReason" type="text" class="form-control input-md" readonly="readonly" onclick="return load();">
                             </div>
                         </div>
                         <div class="col-md-8 col-md-offset-4 animate-box">
@@ -93,51 +103,83 @@
 function load() {
     document.getElementById('errMessage').innerHTML = "";
 }
-function changeColor(){
+function changeColor1(){
+   document.getElementById('errMessage').innerHTML = "";
+   var spanElement = document.getElementById("goods");  
+   spanElement.setAttribute("style","color:#5B5B5B;");  
+   spanElement.style.cssText = "color:#5B5B5B;"; 
+}
+function changeColor2(){
    document.getElementById('errMessage').innerHTML = "";
    var spanElement = document.getElementById("address");  
    spanElement.setAttribute("style","color:#5B5B5B;");  
-   spanElement.style.cssText = "color:#5B5B5B;";  
+   spanElement.style.cssText = "color:#5B5B5B;";
 }
 function changeColorRe(){
     document.getElementById('errMessage').innerHTML = "";
     var spanElement = document.getElementById("address");  
     spanElement.setAttribute("style","color:#9D9D9D;");  
-    spanElement.style.cssText = "color:#9D9D9D;";  
+    spanElement.style.cssText = "color:#9D9D9D;";
+    spanElement = document.getElementById("goods");  
+    spanElement.setAttribute("style","color:#9D9D9D;");  
+    spanElement.style.cssText = "color:#9D9D9D;"; 
 }
 
-//二级联动查询积分名称
-function clickAddress() {
-    var add = $("#address").val();
-    if(add == "选择账户"){
-        $("#institution").val("");
-        $("#asset").val("");
+//二级联动查询商品单价
+function clickGoods() {
+    var ins = "<%= ins %>";
+    var asset = "<%= asset %>";
+    var goodsName = $("#goods").val();
+
+    if(goodsName == "选择商品"){
+        $("#price").val("");
         return false;     
     }
     var data = {
-        "add": add
+        "ins": ins,
+        "asset": asset,
+        "goodsName": goodsName
     };
     $.ajax({          
-        url: '/queryAssetByAddress',
+        url: '/queryGoodsPrice',
         type: 'post',
         data: data,
         dataType: 'json',
         success: function(data) {
             var ret = $.parseJSON(data);
             if (ret.code == 200) {
-                var assetBack = $.parseJSON(ret.tips);
-                $("#institution").val(assetBack[0].institution);
-                $("#asset").val(assetBack[0].asset);
+                var goodsBack = $.parseJSON(ret.tips);
+                $("#price").val(goodsBack[0].price);
             } else {
-                $("#institution").val("");
-                $("#asset").val("");
+                $("#price").val("");
             }
         },
         error: function(jqXHR, textStatus, errorThrown) { 
-            $("#institution").val("");
-            $("#asset").val("");
+            $("#price").val("");
         }
     });  
+}
+
+//商品数量变化时自动计算积分数量，自动填入消费事由
+function autoDo() {
+    var goodsName = $("#goods").val();
+    var count = $.trim($('#count').val());
+    var countNum = Number(count);
+    var price = $.trim($('#price').val());
+    var priceNum = Number(price);    
+    if (isNaN(countNum)) {
+        $("#amount").val("");
+        $("#expenseReason").val("");
+        return false;
+    }
+    if (countNum <= 0) {
+        $("#amount").val("");
+        $("#expenseReason").val("");
+        return false;
+    }
+    var amount = String(countNum * priceNum);
+    $("#amount").val(amount);
+    $("#expenseReason").val( "换购商品 " + goodsName + "，数量 " + count + "，花费积分 " + amount);
 }
 
 $(function() {
@@ -146,32 +188,40 @@ $(function() {
     });
     $("#expense").click(function() {
         load();
-        var $txtAddress = $('#address'),
-        address = $txtAddress.val(),        
-        $txtAsset = $('#asset'),
-        asset = $txtAsset.val(),
+        var $txtGoods = $('#goods'),
+        goods = $txtGoods.val(),
+        $txtAddress = $('#address'),
+        address = $txtAddress.val(),
+        asset = "<%= asset %>",
+        $txtCount = $('#count'),
+        count = $.trim($txtCount.val()),
         $txtAmount = $('#amount'),
-        amount = $.trim($txtAmount.val()),
+        amount = $txtAmount.val(),      
         $txtExpenseReason = $('#expenseReason'),
-        expenseReason = $.trim($txtExpenseReason.val());
+        expenseReason = $txtExpenseReason.val();
+        if (goods == "选择商品") {
+            document.getElementById('errMessage').innerHTML = "请选择商品";
+            $txtGoods.focus();
+            return false;
+        }        
         if (address == "选择账户") {
             document.getElementById('errMessage').innerHTML = "请选择账户";
             $txtAddress.focus();
             return false;
         }            
-        if (amount.length == 0) {
-            document.getElementById('errMessage').innerHTML = "积分数量不能为空";
-            $txtAmount.focus();
+        if (count.length == 0) {
+            document.getElementById('errMessage').innerHTML = "商品数量不能为空";
+            $txtCount.focus();
             return false;
         }
-        if (isNaN(Number(amount))) {
-            document.getElementById('errMessage').innerHTML = "积分数量错误";
-            $txtAmount.focus();
+        if (isNaN(Number(count))) {
+            document.getElementById('errMessage').innerHTML = "商品数量错误";
+            $txtCount.focus();
             return false;
         }
-        if (Number(amount) <= 0) {
-            document.getElementById('errMessage').innerHTML = "积分数量不能为负";
-            $txtAmount.focus();
+        if (Number(count) <= 0) {
+            document.getElementById('errMessage').innerHTML = "商品数量不能为负";
+            $txtCount.focus();
             return false;
         }           
         var data = {

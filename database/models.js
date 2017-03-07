@@ -11,6 +11,8 @@ module.exports = {
     address:{ 
         user:{type:String,required:true},
         address:{type:String,required:true},
+        sk:{type:String,required:true},
+        pk:{type:String,required:true},        
         institution:{type:String,required:true},
         asset:{type:String,required:true},
         time:{type:String}
@@ -25,6 +27,13 @@ module.exports = {
     asset:{ 
         institution:{type:String,required:true},
         asset:{type:String,required:true},
+        rate:{type:String,required:true},
         time:{type:String}
     },
+    goods:{
+        institution:{type:String,required:true},
+        asset:{type:String,required:true},
+        name:{type:String,required:true},
+        price:{type:String,required:true},
+    },    
 };

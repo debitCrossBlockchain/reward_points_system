@@ -48,7 +48,10 @@
                                             </th>
                                             <th>
                                                 积分余量
-                                            </th>                                          
+                                            </th>
+                                            <th>
+                                                官方承兑比率
+                                            </th>                                            
                                         </tr>
                                     </thead>
                                     <tbody id='context'></tbody>
@@ -92,9 +95,10 @@ $(function() {
                     // }
                     // assetRes.UserBalance.sort(getSortFun('asc', 'Expire'));
 
-                    for (i = 0; i < assetRes.Institution.length; i++) {
-                        vv = vv +   "<tr><td>" + assetRes.Institution[i].Name + 
-                                    "</td><td>" + assetRes.Institution[i].RestNumber +
+                    for (i = 0; i < assetRes.length; i++) {
+                        vv = vv +   "<tr><td>" + assetRes[i].assetName + 
+                                    "</td><td>" + assetRes[i].amount +
+                                    "</td><td>" + assetRes[i].rate +
                                     "</td></tr>";
                     }
                     document.getElementById("context").innerHTML = vv;

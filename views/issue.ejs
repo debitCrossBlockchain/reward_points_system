@@ -33,14 +33,19 @@
                 <div class="fh5co-spacer fh5co-spacer-xs"></div>
 				<div class="row">
                     <form class="form-horizontal" method="post">
-                        <div class="col-md-3 col-md-offset-2 animate-box">
+                        <div class="col-md-2 col-md-offset-1 animate-box">
                             <div class="form-group">
                                 <input placeholder=" 积分名称" id="assetName" type="text" class="form-control input-md" onclick="return load();">
                             </div>
                         </div>
-                        <div class="col-md-3 col-md-offset-1 animate-box">
+                        <div class="col-md-2 col-md-offset-1 animate-box">
                             <div class="form-group">
                                 <input placeholder=" 积分数量" id="amount" type="text" class="form-control input-md" onclick="return load();">
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-md-offset-1 animate-box">
+                            <div class="form-group">
+                                <input placeholder=" 官方承兑比率" id="rate" type="text" class="form-control input-md" onclick="return load();">
                             </div>
                         </div>
 
@@ -76,7 +81,9 @@ $(function() {
         var $txtAssetName = $('#assetName'),
         assetName = $.trim($txtAssetName.val()),
         $txtAmount = $('#amount'),
-        amount = $.trim($txtAmount.val());
+        amount = $.trim($txtAmount.val()),
+        $txtRate = $('#rate'),
+        rate = $.trim($txtRate.val());       
         if (assetName.length == 0) {
             document.getElementById('errMessage').innerHTML = "积分名称不能为空";
             $txtAssetName.focus();
@@ -96,10 +103,26 @@ $(function() {
             document.getElementById('errMessage').innerHTML = "积分数量不能为负";
             $txtAmount.focus();
             return false;
-        }                       
+        }
+        if (rate.length == 0) {
+            document.getElementById('errMessage').innerHTML = "承兑比率不能为空";
+            $txtRate.focus();
+            return false;
+        }
+        if (isNaN(Number(rate))) {
+            document.getElementById('errMessage').innerHTML = "承兑比率错误";
+            $txtRate.focus();
+            return false;
+        }
+        if (Number(rate) <= 0) {
+            document.getElementById('errMessage').innerHTML = "承兑比率不能为负";
+            $txtRate.focus();
+            return false;
+        }                                
         var data = {
             "assetName": assetName,
-            "amount": amount
+            "amount": amount,
+            "rate": rate
         };
         $.ajax({
             url: '/issue',
